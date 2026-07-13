@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Test fixture. Date tokens %%M0%% / %%M1%% / %%M2%% are replaced by the test
+  loader (see tests/mu-fixture-loader.php) with the current month, next month,
+  and the month after, as YYYY-MM, so rows always land inside the import window.
+
+  Coverage:
+  - normal event with [public] description + URL + internal-notes marker (9468)
+  - all-day event 00:00:00/23:59:59 (8802)
+  - suppressed-by-title Mass (9954)
+  - event ccb_id 7 vs group ccb_id 7 overlap (noon Mass) and group ccb_id 9
+    on an unrelated event (9632) - attribute scoping test
+  - duplicate series: two "Mass (anticipated)" with different ccb_ids, same slot
+  - duplicate uid: 9468 appears twice on the same date (in-run dedup test)
+  - blank-location Divine Mercy Chaplet (event-specific substitution test)
+  - next-month and month-after events (window spread)
+-->
+<items>
+  <item>
+    <date>%%M0%%-15</date>
+    <event_name ccb_id="9468">Men's Bible Study</event_name>
+    <event_description>&lt;p&gt;[public]Join us for coffee and scripture. Details: https://stpacc.org/bible-study[/public]&lt;/p&gt;&lt;p&gt;INTERNAL_NOTE_MARKER unlock the St. Peter Room by 6:45&lt;/p&gt;</event_description>
+    <start_time>07:00:00</start_time>
+    <end_time>08:15:00</end_time>
+    <event_duration>75</event_duration>
+    <event_type>Open To All</event_type>
+    <location>St. Peter Room</location>
+    <group_name ccb_id="17">Men's Prayer Breakfast &amp; Bible Study</group_name>
+    <group_type>Adult Ministry</group_type>
+    <grouping_name>Parish Ministry</grouping_name>
+    <leader_name ccb_id="27895">Deborah Stacey</leader_name>
+    <leader_phone>(614) 745-7845</leader_phone>
+    <leader_email>dstacey@stpacc.org</leader_email>
+  </item>
+  <item>
+    <date>%%M0%%-15</date>
+    <event_name ccb_id="9468">Men's Bible Study</event_name>
+    <event_description></event_description>
+    <start_time>07:00:00</start_time>
+    <end_time>08:15:00</end_time>
+    <event_duration>75</event_duration>
+    <event_type>Open To All</event_type>
+    <location>St. Peter Room</location>
+    <group_name ccb_id="17">Men's Prayer Breakfast &amp; Bible Study</group_name>
+    <group_type>Adult Ministry</group_type>
+    <grouping_name>Parish Ministry</grouping_name>
+    <leader_name ccb_id="27895">Deborah Stacey</leader_name>
+    <leader_phone></leader_phone>
+    <leader_email></leader_email>
+  </item>
+  <item>
+    <date>%%M0%%-16</date>
+    <event_name ccb_id="8802">St. Vincent de Paul (SVDP) Food Pantry Drive</event_name>
+    <event_description>&lt;p&gt;Area used to sort donations. INTERNAL_NOTE_MARKER&lt;/p&gt;</event_description>
+    <start_time>00:00:00</start_time>
+    <end_time>23:59:59</end_time>
+    <event_duration>1439.9833333333</event_duration>
+    <event_type>Open To All</event_type>
+    <location>Narthex</location>
+    <group_name ccb_id="28">St. Vincent de Paul Society</group_name>
+    <group_type>Adult Ministry</group_type>
+    <grouping_name>Parish Ministry</grouping_name>
+    <leader_name ccb_id="27895">Deborah Stacey</leader_name>
+    <leader_phone>(614) 745-7845</leader_phone>
+    <leader_email>dstacey@stpacc.org</leader_email>
+  </item>
+  <item>
+    <date>%%M0%%-16</date>
+    <event_name ccb_id="9954">Mass</event_name>
+    <event_description>&lt;p&gt;[public]Find the full Mass schedule at https://stpacc.org/about/mass-times[/public]&lt;/p&gt;</event_description>
+    <start_time>08:15:00</start_time>
+    <end_time>09:15:00</end_time>
+    <event_duration>60</event_duration>
+    <event_type>Open To All</event_type>
+    <location>Church (nave)</location>
+    <group_name ccb_id="7">Parish Liturgies</group_name>
+    <group_type>Events</group_type>
+    <grouping_name>Parish Ministry</grouping_name>
+    <leader_name ccb_id="1">Aron Aziz</leader_name>
+    <leader_phone></leader_phone>
+    <leader_email>aaziz@stpacc.org</leader_email>
+  </item>
+  <item>
+    <date>%%M0%%-16</date>
+    <event_name ccb_id="7">Mass</event_name>
+    <event_description></event_description>
+    <start_time>12:00:00</start_time>
+    <end_time>13:00:00</end_time>
+    <event_duration>60</event_duration>
+    <event_type>Open To All</event_type>
+    <location>Church (nave)</location>
+    <group_name ccb_id="7">Parish Liturgies</group_name>
+    <group_type>Events</group_type>
+    <grouping_name>Parish Ministry</grouping_name>
+    <leader_name ccb_id="1">Aron Aziz</leader_name>
+    <leader_phone></leader_phone>
+    <leader_email>aaziz@stpacc.org</leader_email>
+  </item>
+  <item>
+    <date>%%M0%%-18</date>
+    <event_name ccb_id="9">Mass (anticipated)</event_name>
+    <event_description></event_description>
+    <start_time>16:00:00</start_time>
+    <end_time>17:00:00</end_time>
+    <event_duration>60</event_duration>
+    <event_type>Open To All</event_type>
+    <location>Church (nave)</location>
+    <group_name ccb_id="7">Parish Liturgies</group_name>
+    <group_type>Events</group_type>
+    <grouping_name>Parish Ministry</grouping_name>
+    <leader_name ccb_id="1">Aron Aziz</leader_name>
+    <leader_phone></leader_phone>
+    <leader_email>aaziz@stpacc.org</leader_email>
+  </item>
+  <item>
+    <date>%%M0%%-18</date>
+    <event_name ccb_id="10341">Mass (anticipated)</event_name>
+    <event_description></event_description>
+    <start_time>16:00:00</start_time>
+    <end_time>17:00:00</end_time>
+    <event_duration>60</event_duration>
+    <event_type>Open To All</event_type>
+    <location>Church (nave)</location>
+    <group_name ccb_id="7">Parish Liturgies</group_name>
+    <group_type>Events</group_type>
+    <grouping_name>Parish Ministry</grouping_name>
+    <leader_name ccb_id="1">Aron Aziz</leader_name>
+    <leader_phone></leader_phone>
+    <leader_email>aaziz@stpacc.org</leader_email>
+  </item>
+  <item>
+    <date>%%M0%%-18</date>
+    <event_name ccb_id="9632">After the 4:00 PM Mass - Farewell Reception</event_name>
+    <event_description>&lt;p&gt;[public]All are welcome in the Parish Hall after Mass.[/public]&lt;/p&gt;</event_description>
+    <start_time>17:00:00</start_time>
+    <end_time>18:30:00</end_time>
+    <event_duration>90</event_duration>
+    <event_type>Open To All</event_type>
+    <location>Parish Hall</location>
+    <group_name ccb_id="9">Parish Events</group_name>
+    <group_type>Events</group_type>
+    <grouping_name>Parish Ministry</grouping_name>
+    <leader_name ccb_id="1">Aron Aziz</leader_name>
+    <leader_phone></leader_phone>
+    <leader_email>aaziz@stpacc.org</leader_email>
+  </item>
+  <item>
+    <date>%%M0%%-20</date>
+    <event_name ccb_id="10048">Divine Mercy Chaplet</event_name>
+    <event_description></event_description>
+    <start_time>15:00:00</start_time>
+    <end_time>15:20:00</end_time>
+    <event_duration>20</event_duration>
+    <event_type>Open To All</event_type>
+    <location></location>
+    <group_name ccb_id="7">Parish Liturgies</group_name>
+    <group_type>Events</group_type>
+    <grouping_name>Parish Ministry</grouping_name>
+    <leader_name ccb_id="1">Aron Aziz</leader_name>
+    <leader_phone></leader_phone>
+    <leader_email>aaziz@stpacc.org</leader_email>
+  </item>
+  <item>
+    <date>%%M1%%-05</date>
+    <event_name ccb_id="9835">Friendship Project - Women's Morning Study Group</event_name>
+    <event_description>&lt;p&gt;[public]New members welcome.[/public]&lt;/p&gt;</event_description>
+    <start_time>09:30:00</start_time>
+    <end_time>11:00:00</end_time>
+    <event_duration>90</event_duration>
+    <event_type>Open To All</event_type>
+    <location>St. Clare Room</location>
+    <group_name ccb_id="21">Friendship Project</group_name>
+    <group_type>Adult Ministry</group_type>
+    <grouping_name>Parish Ministry</grouping_name>
+    <leader_name ccb_id="27895">Deborah Stacey</leader_name>
+    <leader_phone>(614) 745-7845</leader_phone>
+    <leader_email>dstacey@stpacc.org</leader_email>
+  </item>
+  <item>
+    <date>%%M2%%-10</date>
+    <event_name ccb_id="9820">The Mass: What's going on and how to pray it better</event_name>
+    <event_description>&lt;p&gt;[public]A four-week study series.[/public]&lt;/p&gt;</event_description>
+    <start_time>18:30:00</start_time>
+    <end_time>20:00:00</end_time>
+    <event_duration>90</event_duration>
+    <event_type>Open To All</event_type>
+    <location>Parish Hall</location>
+    <group_name ccb_id="16">Adult Faith Formation</group_name>
+    <group_type>Adult Ministry</group_type>
+    <grouping_name>Parish Ministry</grouping_name>
+    <leader_name ccb_id="27895">Deborah Stacey</leader_name>
+    <leader_phone>(614) 745-7845</leader_phone>
+    <leader_email>dstacey@stpacc.org</leader_email>
+  </item>
+</items>

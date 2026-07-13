@@ -1,0 +1,400 @@
+/* Parish Events frontend styles: calendar/list, featured cards, single pages. */
+
+/* --- Controls --- */
+.pe-controls {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 1.25rem;
+}
+
+.pe-view-toggle a {
+	display: inline-block;
+	padding: 0.35rem 0.9rem;
+	border: 1px solid #ccc;
+	text-decoration: none;
+	color: inherit;
+}
+
+.pe-view-toggle a:first-child {
+	border-radius: 4px 0 0 4px;
+}
+
+.pe-view-toggle a:last-child {
+	border-radius: 0 4px 4px 0;
+	border-left: 0;
+}
+
+.pe-view-toggle a.pe-toggle-active {
+	background: #2c5f2d;
+	border-color: #2c5f2d;
+	color: #fff;
+}
+
+.pe-group-filter select {
+	max-width: 100%;
+}
+
+/* --- List view --- */
+.pe-date-heading {
+	margin: 1.5rem 0 0.5rem;
+	padding-bottom: 0.25rem;
+	border-bottom: 2px solid #2c5f2d;
+}
+
+.pe-day-list {
+	list-style: none;
+	margin: 0 0 0.5rem;
+	padding: 0;
+}
+
+/* Two fixed columns: time | details. The title wraps inside its own column
+   and the location always sits on its own muted line beneath the title, so
+   every row reads the same regardless of name length. */
+.pe-event-row {
+	display: grid;
+	grid-template-columns: 6.5em minmax(0, 1fr);
+	column-gap: 1rem;
+	align-items: baseline;
+	padding: 0.5rem 0.25rem;
+	border-bottom: 1px solid #eee;
+	margin: 0;
+}
+
+.pe-event-time {
+	grid-column: 1;
+	grid-row: 1 / span 2;
+	font-weight: 600;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+}
+
+.pe-event-title {
+	grid-column: 2;
+	grid-row: 1;
+	font-weight: 600;
+	text-decoration: none;
+	overflow-wrap: break-word;
+}
+
+a.pe-event-title:hover {
+	text-decoration: underline;
+}
+
+.pe-event-location {
+	grid-column: 2;
+	grid-row: 2;
+	color: #666;
+	font-size: 0.85em;
+}
+
+@media (max-width: 480px) {
+	.pe-event-row {
+		grid-template-columns: 5em minmax(0, 1fr);
+		column-gap: 0.6rem;
+	}
+}
+
+/* --- Month grid --- */
+.pe-month-nav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 0.75rem;
+}
+
+.pe-month-title {
+	font-size: 1.25em;
+	font-weight: 700;
+}
+
+.pe-month-nav .pe-disabled {
+	color: #bbb;
+}
+
+.pe-month-grid {
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+
+.pe-month-grid th {
+	padding: 0.4rem 0.2rem;
+	background: #2c5f2d;
+	color: #fff;
+	font-size: 0.85em;
+	text-align: center;
+}
+
+.pe-month-grid td {
+	vertical-align: top;
+	border: 1px solid #ddd;
+	padding: 0.25rem;
+	height: 5.5rem;
+}
+
+.pe-day-number {
+	display: block;
+	font-size: 0.85em;
+	font-weight: 600;
+	color: #555;
+	margin-bottom: 0.15rem;
+}
+
+.pe-today {
+	background: #f3f9f3;
+}
+
+.pe-today .pe-day-number {
+	color: #2c5f2d;
+}
+
+.pe-past .pe-day-number {
+	color: #bbb;
+}
+
+.pe-past .pe-cell-events a,
+.pe-past .pe-cell-events span {
+	color: #999;
+	background: #f2f2f2;
+}
+
+.pe-cell-events {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	font-size: 0.78em;
+	line-height: 1.3;
+}
+
+.pe-cell-events li {
+	margin: 0 0 0.25rem;
+}
+
+/* Event pills: names clamp to two lines so one long title can't blow a
+   week's row height out; the full name is in the title attribute. */
+.pe-cell-events a,
+.pe-cell-events span {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	overflow-wrap: break-word;
+	text-decoration: none;
+	background: #e9f1e9;
+	color: #1e4620;
+	border-radius: 3px;
+	padding: 0.1rem 0.3rem;
+}
+
+.pe-cell-events a:hover {
+	background: #d7e6d7;
+	text-decoration: none;
+}
+
+.pe-empty-cell {
+	background: #fafafa;
+}
+
+/* --- Featured cards --- */
+.pe-featured-cards {
+	display: grid;
+	gap: 1.25rem;
+	grid-template-columns: repeat(1, 1fr);
+}
+
+@media (min-width: 600px) {
+	.pe-featured-cards.pe-columns-2,
+	.pe-featured-cards.pe-columns-3,
+	.pe-featured-cards.pe-columns-4 {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (min-width: 900px) {
+	.pe-featured-cards.pe-columns-3 {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.pe-featured-cards.pe-columns-4 {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+.pe-card {
+	border: 1px solid #e2e2e2;
+	border-radius: 6px;
+	overflow: hidden;
+	background: #fff;
+	display: flex;
+	flex-direction: column;
+}
+
+.pe-card-image img {
+	display: block;
+	width: 100%;
+	height: 180px;
+	object-fit: cover;
+}
+
+.pe-card-body {
+	padding: 0.9rem 1rem 1.1rem;
+}
+
+.pe-card-title {
+	margin: 0 0 0.35rem;
+	font-size: 1.05em;
+}
+
+.pe-card-title a {
+	text-decoration: none;
+}
+
+.pe-card-meta {
+	margin: 0 0 0.5rem;
+	color: #666;
+	font-size: 0.88em;
+}
+
+.pe-card-excerpt {
+	margin: 0;
+	font-size: 0.92em;
+}
+
+/* --- Single event page --- */
+.pe-cancelled-banner {
+	margin: 0 0 1.25rem;
+	padding: 0.75rem 1rem;
+	background: #fbeaea;
+	border-left: 4px solid #c0392b;
+	color: #7b241c;
+	font-weight: 600;
+}
+
+.pe-event-details {
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	gap: 0.3rem 1rem;
+	margin: 0 0 1.5rem;
+	padding: 1rem 1.25rem;
+	background: #f7f7f7;
+	border-radius: 6px;
+}
+
+.pe-event-details dt {
+	font-weight: 700;
+}
+
+.pe-event-details dd {
+	margin: 0;
+}
+
+.pe-empty {
+	color: #666;
+	font-style: italic;
+}
+
+/* --- Calendar buttons: add-to-calendar, subscribe --- */
+.pe-add-to-calendar {
+	margin: 0 0 1.5rem;
+}
+
+.pe-cal-btn,
+.pe-subscribe {
+	display: inline-block;
+	padding: 0.3rem 0.85rem;
+	border: 1px solid #2c5f2d;
+	border-radius: 4px;
+	color: #2c5f2d;
+	text-decoration: none;
+	font-size: 0.9em;
+	font-weight: 600;
+}
+
+.pe-cal-btn:hover,
+.pe-subscribe:hover {
+	background: #2c5f2d;
+	color: #fff;
+	text-decoration: none;
+}
+
+/* --- Upcoming events (widget / shortcode) --- */
+.pe-upcoming {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.pe-upcoming li {
+	padding: 0.35rem 0;
+	border-bottom: 1px solid #eee;
+}
+
+.pe-upcoming li:last-child {
+	border-bottom: 0;
+}
+
+.pe-upcoming-when {
+	display: block;
+	font-size: 0.82em;
+	color: #666;
+}
+
+.pe-upcoming a {
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.pe-upcoming a:hover {
+	text-decoration: underline;
+}
+
+.pe-upcoming-loc {
+	font-size: 0.85em;
+	color: #666;
+}
+
+/* --- Location directory disclosure --- */
+.pe-location-info {
+	display: inline-block;
+}
+
+.pe-location-info summary {
+	cursor: pointer;
+	color: inherit;
+	text-decoration: underline;
+	text-decoration-style: dotted;
+	text-underline-offset: 2px;
+}
+
+.pe-location-info summary::after {
+	content: " ⓘ";
+	font-size: 0.85em;
+}
+
+.pe-location-detail {
+	margin: 0.35rem 0 0.25rem;
+	padding: 0.6rem 0.8rem;
+	max-width: 34em;
+	background: #f3f7f3;
+	border-left: 3px solid #2c5f2d;
+	border-radius: 0 4px 4px 0;
+	font-size: 0.95em;
+}
+
+.pe-location-detail p {
+	margin: 0 0 0.4rem;
+}
+
+.pe-location-detail p:last-child {
+	margin-bottom: 0;
+}
+
+.pe-location-link {
+	text-decoration: underline;
+	text-decoration-style: dotted;
+	text-underline-offset: 2px;
+	color: inherit;
+}

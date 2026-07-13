@@ -1,0 +1,58 @@
+/* Parish Events admin styles. */
+
+.pe-sync {
+	display: inline-block;
+	padding: 0.1em 0.6em;
+	border-radius: 3px;
+	font-size: 0.85em;
+}
+
+.pe-sync-ok {
+	background: #e6f4e6;
+	color: #1e6b21;
+}
+
+.pe-sync-override {
+	background: #eef2ff;
+	color: #29408f;
+}
+
+.pe-sync-warning {
+	background: #fdf3e0;
+	color: #8a5a00;
+}
+
+.pe-sync-warning.dashicons-before::before {
+	vertical-align: text-bottom;
+	margin-right: 2px;
+}
+
+.pe-sync-removed {
+	background: #fbeaea;
+	color: #96281b;
+}
+
+.pe-run-log td,
+.pe-run-log th {
+	white-space: nowrap;
+}
+
+.pe-run-log td:last-child {
+	white-space: normal;
+}
+
+.pe-run-log .pe-error {
+	color: #b32d2e;
+}
+
+.pe-sync-info {
+	line-height: 1.7;
+}
+
+.column-pe_flags .dashicons {
+	color: #b58900;
+}
+
+.column-pe_flags .dashicons-lock {
+	color: #555;
+}
