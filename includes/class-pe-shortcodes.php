@@ -310,8 +310,25 @@ class PE_Shortcodes {
 		return $html;
 	}
 
+	/**
+	 * Base URL for navigation links: the page's permalink, never the current
+	 * request URI. Shortcodes also render inside REST requests (the block
+	 * editor renders page content via /wp/v2/pages), and a request-derived
+	 * base would be fragment-cached and served to front-end visitors as
+	 * /wp-json/... links.
+	 *
+	 * @return string
+	 */
+	private static function base_url() {
+		$permalink = get_permalink();
+		if ( ! $permalink ) {
+			$permalink = get_permalink( get_queried_object_id() );
+		}
+		return $permalink ? $permalink : home_url( '/' );
+	}
+
 	private static function render_controls( $view, $group, $atts ) {
-		$base = remove_query_arg( array( 'pe_view', 'pe_group', 'pe_month' ) );
+		$base = self::base_url();
 		$html = '<div class="pe-controls">';
 
 		if ( '1' === $atts['show_toggle'] ) {
@@ -412,7 +429,17 @@ class PE_Shortcodes {
 			}
 		}
 
-		$base = remove_query_arg( array( 'pe_month' ) );
+		// Explicit args on the permalink — never the current request URI
+		// (see base_url()).
+		$base = add_query_arg(
+			array_filter(
+				array(
+					'pe_view'  => 'month',
+					'pe_group' => $group,
+				)
+			),
+			self::base_url()
+		);
 		$html = '<div class="pe-month-nav">';
 
 		$prev = $first->modify( '-1 month' )->format( 'Y-m' );
