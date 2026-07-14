@@ -48,7 +48,10 @@ class PE_JsonLD {
 			return;
 		}
 
-		echo '<script type="application/ld+json">' . wp_json_encode( $data, JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		// JSON_HEX_TAG keeps any feed-supplied "</script>" from terminating
+		// this script element; never emit unescaped slashes into script
+		// context.
+		echo '<script type="application/ld+json">' . wp_json_encode( $data, JSON_HEX_TAG | JSON_HEX_AMP ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**

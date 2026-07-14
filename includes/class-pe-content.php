@@ -13,7 +13,49 @@ class PE_Content {
 	public static function init() {
 		add_filter( 'the_content', array( __CLASS__, 'filter_content' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'gone_after_grace' ) );
+		add_filter( 'rest_request_before_callbacks', array( __CLASS__, 'rest_gone_after_grace' ), 10, 3 );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'maybe_enqueue' ) );
+	}
+
+	/**
+	 * Mirror the front-end 410 in the REST API: the pe_removed status is
+	 * registered public (for the grace-window page), so without this a
+	 * removed event would stay readable at /wp/v2/parish_event/<id> forever.
+	 * (rest_request_before_callbacks is the hook that may return WP_Error;
+	 * rest_prepare_* must return a response object.)
+	 *
+	 * @param mixed           $response Current response (null when unhandled).
+	 * @param array           $handler  Route handler.
+	 * @param WP_REST_Request $request  The request.
+	 * @return mixed
+	 */
+	public static function rest_gone_after_grace( $response, $handler, $request ) {
+		if ( null !== $response ) {
+			return $response;
+		}
+
+		$type_obj  = get_post_type_object( PE_CPT::POST_TYPE );
+		$rest_base = ( $type_obj && $type_obj->rest_base ) ? $type_obj->rest_base : PE_CPT::POST_TYPE;
+		if ( ! preg_match( '#^/wp/v2/' . preg_quote( $rest_base, '#' ) . '/(\d+)$#', $request->get_route(), $m ) ) {
+			return $response;
+		}
+
+		$post = get_post( (int) $m[1] );
+		if (
+			$post
+			&& PE_CPT::POST_TYPE === $post->post_type
+			&& PE_CPT::STATUS_REMOVED === $post->post_status
+			&& ! self::in_cancelled_grace( $post->ID )
+			&& ! current_user_can( 'edit_post', $post->ID )
+		) {
+			return new WP_Error(
+				'pe_event_gone',
+				__( 'This event is no longer available.', 'parish-events' ),
+				array( 'status' => 410 )
+			);
+		}
+
+		return $response;
 	}
 
 	/**
@@ -75,6 +117,20 @@ class PE_Content {
 				$html .= ' <a class="pe-cal-btn" target="_blank" rel="noopener noreferrer" href="' . esc_url( $google ) . '">' . esc_html__( 'Google Calendar', 'parish-events' ) . '</a>';
 			}
 			$html .= '</p>';
+		}
+
+		// The linkify + kses pipeline exists for import-owned plain text.
+		// Admin-authored content (override on, manually created, or block
+		// markup) has already been through the editor's own sanitization and
+		// core's content filters — re-ksesing it would strip headings,
+		// images, and lists.
+		$raw         = get_post_field( 'post_content', $post_id );
+		$admin_owned = '1' === get_post_meta( $post_id, '_pe_override', true )
+			|| '' === get_post_meta( $post_id, '_pe_uid', true )
+			|| has_blocks( $raw );
+
+		if ( $admin_owned ) {
+			return $html . $content;
 		}
 
 		$desc = trim( $content );

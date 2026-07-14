@@ -30,3 +30,9 @@ delete_option( 'pe_run_log' );
 delete_option( 'pe_cache_ver' );
 delete_option( 'pe_import_lock' );
 delete_option( 'pe_linked_occurrences' );
+delete_option( 'pe_fail_streak' );
+delete_option( 'pe_alert_active' );
+
+// Fragment-cache transients (they expire on their own, but leave nothing behind).
+global $wpdb;
+$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient\_pe\_frag\_%' OR option_name LIKE '\_transient\_timeout\_pe\_frag\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery

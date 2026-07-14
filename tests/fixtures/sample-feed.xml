@@ -28,9 +28,9 @@
     <group_name ccb_id="17">Men's Prayer Breakfast &amp; Bible Study</group_name>
     <group_type>Adult Ministry</group_type>
     <grouping_name>Parish Ministry</grouping_name>
-    <leader_name ccb_id="27895">Deborah Stacey</leader_name>
-    <leader_phone>(614) 745-7845</leader_phone>
-    <leader_email>dstacey@stpacc.org</leader_email>
+    <leader_name ccb_id="27895">Pat Coordinator</leader_name>
+    <leader_phone>(555) 555-0100</leader_phone>
+    <leader_email>coordinator@example.org</leader_email>
   </item>
   <item>
     <date>%%M0%%-15</date>
@@ -44,7 +44,7 @@
     <group_name ccb_id="17">Men's Prayer Breakfast &amp; Bible Study</group_name>
     <group_type>Adult Ministry</group_type>
     <grouping_name>Parish Ministry</grouping_name>
-    <leader_name ccb_id="27895">Deborah Stacey</leader_name>
+    <leader_name ccb_id="27895">Pat Coordinator</leader_name>
     <leader_phone></leader_phone>
     <leader_email></leader_email>
   </item>
@@ -60,9 +60,9 @@
     <group_name ccb_id="28">St. Vincent de Paul Society</group_name>
     <group_type>Adult Ministry</group_type>
     <grouping_name>Parish Ministry</grouping_name>
-    <leader_name ccb_id="27895">Deborah Stacey</leader_name>
-    <leader_phone>(614) 745-7845</leader_phone>
-    <leader_email>dstacey@stpacc.org</leader_email>
+    <leader_name ccb_id="27895">Pat Coordinator</leader_name>
+    <leader_phone>(555) 555-0100</leader_phone>
+    <leader_email>coordinator@example.org</leader_email>
   </item>
   <item>
     <date>%%M0%%-16</date>
@@ -76,9 +76,9 @@
     <group_name ccb_id="7">Parish Liturgies</group_name>
     <group_type>Events</group_type>
     <grouping_name>Parish Ministry</grouping_name>
-    <leader_name ccb_id="1">Aron Aziz</leader_name>
+    <leader_name ccb_id="1">Sam Liturgist</leader_name>
     <leader_phone></leader_phone>
-    <leader_email>aaziz@stpacc.org</leader_email>
+    <leader_email>liturgy@example.org</leader_email>
   </item>
   <item>
     <date>%%M0%%-16</date>
@@ -92,9 +92,9 @@
     <group_name ccb_id="7">Parish Liturgies</group_name>
     <group_type>Events</group_type>
     <grouping_name>Parish Ministry</grouping_name>
-    <leader_name ccb_id="1">Aron Aziz</leader_name>
+    <leader_name ccb_id="1">Sam Liturgist</leader_name>
     <leader_phone></leader_phone>
-    <leader_email>aaziz@stpacc.org</leader_email>
+    <leader_email>liturgy@example.org</leader_email>
   </item>
   <item>
     <date>%%M0%%-18</date>
@@ -108,9 +108,9 @@
     <group_name ccb_id="7">Parish Liturgies</group_name>
     <group_type>Events</group_type>
     <grouping_name>Parish Ministry</grouping_name>
-    <leader_name ccb_id="1">Aron Aziz</leader_name>
+    <leader_name ccb_id="1">Sam Liturgist</leader_name>
     <leader_phone></leader_phone>
-    <leader_email>aaziz@stpacc.org</leader_email>
+    <leader_email>liturgy@example.org</leader_email>
   </item>
   <item>
     <date>%%M0%%-18</date>
@@ -124,9 +124,9 @@
     <group_name ccb_id="7">Parish Liturgies</group_name>
     <group_type>Events</group_type>
     <grouping_name>Parish Ministry</grouping_name>
-    <leader_name ccb_id="1">Aron Aziz</leader_name>
+    <leader_name ccb_id="1">Sam Liturgist</leader_name>
     <leader_phone></leader_phone>
-    <leader_email>aaziz@stpacc.org</leader_email>
+    <leader_email>liturgy@example.org</leader_email>
   </item>
   <item>
     <date>%%M0%%-18</date>
@@ -140,9 +140,9 @@
     <group_name ccb_id="9">Parish Events</group_name>
     <group_type>Events</group_type>
     <grouping_name>Parish Ministry</grouping_name>
-    <leader_name ccb_id="1">Aron Aziz</leader_name>
+    <leader_name ccb_id="1">Sam Liturgist</leader_name>
     <leader_phone></leader_phone>
-    <leader_email>aaziz@stpacc.org</leader_email>
+    <leader_email>liturgy@example.org</leader_email>
   </item>
   <item>
     <date>%%M0%%-20</date>
@@ -156,9 +156,9 @@
     <group_name ccb_id="7">Parish Liturgies</group_name>
     <group_type>Events</group_type>
     <grouping_name>Parish Ministry</grouping_name>
-    <leader_name ccb_id="1">Aron Aziz</leader_name>
+    <leader_name ccb_id="1">Sam Liturgist</leader_name>
     <leader_phone></leader_phone>
-    <leader_email>aaziz@stpacc.org</leader_email>
+    <leader_email>liturgy@example.org</leader_email>
   </item>
   <item>
     <date>%%M1%%-05</date>
@@ -172,9 +172,9 @@
     <group_name ccb_id="21">Friendship Project</group_name>
     <group_type>Adult Ministry</group_type>
     <grouping_name>Parish Ministry</grouping_name>
-    <leader_name ccb_id="27895">Deborah Stacey</leader_name>
-    <leader_phone>(614) 745-7845</leader_phone>
-    <leader_email>dstacey@stpacc.org</leader_email>
+    <leader_name ccb_id="27895">Pat Coordinator</leader_name>
+    <leader_phone>(555) 555-0100</leader_phone>
+    <leader_email>coordinator@example.org</leader_email>
   </item>
   <item>
     <date>%%M2%%-10</date>
@@ -188,8 +188,8 @@
     <group_name ccb_id="16">Adult Faith Formation</group_name>
     <group_type>Adult Ministry</group_type>
     <grouping_name>Parish Ministry</grouping_name>
-    <leader_name ccb_id="27895">Deborah Stacey</leader_name>
-    <leader_phone>(614) 745-7845</leader_phone>
-    <leader_email>dstacey@stpacc.org</leader_email>
+    <leader_name ccb_id="27895">Pat Coordinator</leader_name>
+    <leader_phone>(555) 555-0100</leader_phone>
+    <leader_email>coordinator@example.org</leader_email>
   </item>
 </items>

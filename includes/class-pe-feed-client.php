@@ -31,7 +31,18 @@ class PE_Feed_Client {
 			return $body;
 		}
 
-		$response = wp_remote_get( $url, array( 'timeout' => 30 ) );
+		// No redirects (the endpoint must answer directly — a redirect could
+		// point the request somewhere the https-only rule never validated)
+		// and a hard response-size cap so a misbehaving origin can't exhaust
+		// memory during import.
+		$response = wp_remote_get(
+			$url,
+			array(
+				'timeout'             => 30,
+				'redirection'         => 0,
+				'limit_response_size' => 5 * MB_IN_BYTES,
+			)
+		);
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
