@@ -93,6 +93,19 @@ class PE_Settings {
 	 * @return array Sanitized settings.
 	 */
 	public static function sanitize( $input ) {
+		if ( ! is_array( $input ) ) {
+			return self::get_all();
+		}
+
+		// On the very first save the option doesn't exist yet, so
+		// update_option falls through to add_option and WordPress runs this
+		// callback a SECOND time — on the output of the first pass, where
+		// the textarea fields are already structured arrays instead of form
+		// strings. That pass must be a no-op or the parsers below fatal.
+		if ( isset( $input['suppress_exact'] ) && is_array( $input['suppress_exact'] ) ) {
+			return array_merge( self::defaults(), $input );
+		}
+
 		$out = self::get_all();
 
 		if ( isset( $input['api_base_url'] ) ) {
@@ -266,6 +279,9 @@ class PE_Settings {
 	 */
 	public static function lines( $value ) {
 		if ( is_array( $value ) ) {
+			// Only string elements can be lines; anything else (e.g. an
+			// already-structured rule array) is dropped rather than fataled on.
+			$value = array_filter( $value, 'is_string' );
 			return array_values( array_filter( array_map( 'trim', $value ), 'strlen' ) );
 		}
 		$lines = preg_split( '/\r\n|\r|\n/', (string) $value );
