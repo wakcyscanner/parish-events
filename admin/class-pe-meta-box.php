@@ -98,6 +98,13 @@ class PE_Meta_Box {
 			<span class="description"><?php esc_html_e( 'Shown in the featured events cards. The featured image can always be set, override or not.', 'parish-events' ); ?></span>
 		</p>
 		<p>
+			<label>
+				<input type="checkbox" name="pe_cancelled" value="1" <?php checked( get_post_meta( $post->ID, '_pe_cancelled', true ), '1' ); ?>>
+				<strong><?php esc_html_e( 'Mark as cancelled', 'parish-events' ); ?></strong>
+			</label><br>
+			<span class="description"><?php esc_html_e( 'Shows a "this event has been cancelled" notice on the event page and tells search engines the event is cancelled. An event merely disappearing from the parish calendar feed shows a neutral notice instead — use this only when the event is actually cancelled.', 'parish-events' ); ?></span>
+		</p>
+		<p>
 			<?php $video_url = get_post_meta( $post->ID, '_pe_video_url', true ); ?>
 			<label><strong><?php esc_html_e( 'Featured video URL', 'parish-events' ); ?></strong><br>
 				<input type="url" class="widefat" name="pe_video_url" value="<?php echo esc_attr( $video_url ); ?>" placeholder="https://youtu.be/…">
@@ -173,6 +180,23 @@ class PE_Meta_Box {
 		$override     = empty( $_POST['pe_override'] ) ? '0' : '1';
 		update_post_meta( $post_id, '_pe_override', $override );
 		update_post_meta( $post_id, '_pe_featured', empty( $_POST['pe_featured'] ) ? '0' : '1' );
+		update_post_meta( $post_id, '_pe_cancelled', empty( $_POST['pe_cancelled'] ) ? '0' : '1' );
+
+		// Checking override on an importer-removed post is a rescue: the
+		// admin is taking ownership, so it goes back to published (there is
+		// no editor UI for the custom status). Unhook first — wp_update_post
+		// re-fires save_post.
+		if ( '1' === $override && PE_CPT::STATUS_REMOVED === get_post_status( $post_id ) ) {
+			remove_action( 'save_post_' . PE_CPT::POST_TYPE, array( __CLASS__, 'save' ) );
+			wp_update_post(
+				array(
+					'ID'          => $post_id,
+					'post_status' => 'publish',
+				)
+			);
+			add_action( 'save_post_' . PE_CPT::POST_TYPE, array( __CLASS__, 'save' ) );
+			delete_post_meta( $post_id, '_pe_removed_at' );
+		}
 
 		// Saved before the override gate below: the video slot is admin-owned
 		// regardless of override status, like the featured image.

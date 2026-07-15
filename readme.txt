@@ -17,7 +17,7 @@ Parish Events replaces a client-side calendar embed with real WordPress content:
 * Scheduled import of the current month plus the next two months from a configurable XML feed endpoint.
 * One `parish_event` post per event occurrence, keyed by CCB event ID + date, so upstream edits update the same post (and its URL never changes).
 * Suppression rules (by CCB event ID, exact title, or title keyword) so recurring events like daily Mass never create posts. Suppressed occurrences still appear on the calendar, linking to a single URL you choose per rule (e.g. the Mass times page).
-* Events deleted upstream move to a "Removed upstream" status; their pages stay reachable with a cancellation notice (and schema.org EventCancelled markup) for a grace period, then return 410 Gone.
+* Events deleted upstream move to a "Removed upstream" status; their pages stay reachable with a neutral "no longer listed" notice for a grace period, then return 410 Gone. Marking an event cancelled is an explicit editorial action (a checkbox on the event) that switches the notice and emits schema.org EventCancelled markup — absence from the feed is never assumed to mean cancelled.
 * Manual override flag per event: imports stop touching every field. Featured images are always yours to set, override or not.
 * Only text wrapped in [public]...[/public] in the CCB description is published; internal notes are never stored in WordPress.
 * Schema.org Event JSON-LD on single event pages for search engines.

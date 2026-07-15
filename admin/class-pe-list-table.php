@@ -77,6 +77,9 @@ class PE_List_Table {
 				if ( '' !== get_post_meta( $post_id, '_pe_video_url', true ) ) {
 					echo '<span class="dashicons dashicons-video-alt3" title="' . esc_attr__( 'Featured video', 'parish-events' ) . '"></span>';
 				}
+				if ( '1' === get_post_meta( $post_id, '_pe_cancelled', true ) ) {
+					echo '<span class="dashicons dashicons-dismiss" title="' . esc_attr__( 'Cancelled', 'parish-events' ) . '"></span>';
+				}
 				if ( '1' === get_post_meta( $post_id, '_pe_override', true ) ) {
 					echo '<span class="dashicons dashicons-lock" title="' . esc_attr__( 'Manual override', 'parish-events' ) . '"></span>';
 				}

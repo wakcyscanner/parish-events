@@ -32,7 +32,7 @@ class PE_Meta_Tags {
 		$type       = get_post_meta( $post_id, '_pe_event_type', true );
 
 		$title = get_the_title( $post_id ) . ' - ' . $date_label;
-		if ( PE_CPT::STATUS_REMOVED === get_post_status( $post_id ) ) {
+		if ( '1' === get_post_meta( $post_id, '_pe_cancelled', true ) ) {
 			$title = __( 'Cancelled:', 'parish-events' ) . ' ' . $title;
 		}
 

@@ -279,13 +279,22 @@ a.pe-event-title:hover {
 	border: 0;
 }
 
-.pe-cancelled-banner {
+.pe-banner {
 	margin: 0 0 1.25rem;
 	padding: 0.75rem 1rem;
+	font-weight: 600;
+}
+
+.pe-cancelled-banner {
 	background: #fbeaea;
 	border-left: 4px solid #c0392b;
 	color: #7b241c;
-	font-weight: 600;
+}
+
+.pe-removed-banner {
+	background: #fdf3e0;
+	border-left: 4px solid #b9770e;
+	color: #7e5109;
 }
 
 .pe-event-details {

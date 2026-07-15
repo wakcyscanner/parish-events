@@ -119,7 +119,7 @@ $pe_run_log  = get_option( 'pe_run_log', array() );
 					<input type="number" min="0" max="60" class="small-text" id="pe_cancelled_grace_days"
 						name="<?php echo esc_attr( PE_Settings::OPTION ); ?>[cancelled_grace_days]"
 						value="<?php echo esc_attr( $pe_settings['cancelled_grace_days'] ); ?>">
-					<p class="description"><?php esc_html_e( 'How long a removed event\'s page stays reachable with a "cancelled" notice (so search engines pick up the cancellation) before returning 410 Gone.', 'parish-events' ); ?></p>
+					<p class="description"><?php esc_html_e( 'How long a removed event\'s page stays reachable with a "no longer listed" notice (a soft landing for saved and indexed links) before returning 410 Gone.', 'parish-events' ); ?></p>
 				</td>
 			</tr>
 			<tr>

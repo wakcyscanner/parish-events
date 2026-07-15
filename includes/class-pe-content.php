@@ -102,8 +102,13 @@ class PE_Content {
 		$post_id = get_the_ID();
 		$html    = '';
 
-		if ( PE_CPT::STATUS_REMOVED === get_post_status( $post_id ) ) {
-			$html .= '<div class="pe-cancelled-banner">' . esc_html__( 'This event has been cancelled.', 'parish-events' ) . '</div>';
+		// "Cancelled" is only ever an explicit admin statement (_pe_cancelled).
+		// Mere absence from the feed gets a neutral notice — events leave the
+		// feed for many reasons besides cancellation.
+		if ( '1' === get_post_meta( $post_id, '_pe_cancelled', true ) ) {
+			$html .= '<div class="pe-banner pe-cancelled-banner">' . esc_html__( 'This event has been cancelled.', 'parish-events' ) . '</div>';
+		} elseif ( PE_CPT::STATUS_REMOVED === get_post_status( $post_id ) ) {
+			$html .= '<div class="pe-banner pe-removed-banner">' . esc_html__( 'This event is no longer listed on the parish calendar. Please contact the parish office with any questions.', 'parish-events' ) . '</div>';
 		}
 
 		// Featured video promotes the event from above the details card.

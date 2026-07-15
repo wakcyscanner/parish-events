@@ -28,16 +28,12 @@ class PE_JsonLD {
 		$post_id = get_queried_object_id();
 		$status  = get_post_status( $post_id );
 
-		if ( 'publish' === $status && pe_event_is_past( $post_id ) ) {
-			return;
-		}
-
-		if ( PE_CPT::STATUS_REMOVED === $status ) {
-			if ( ! PE_Content::in_cancelled_grace( $post_id ) ) {
-				return;
-			}
+		// EventCancelled is only emitted on an explicit admin cancellation —
+		// absence from the feed proves nothing. Removed-but-not-cancelled
+		// pages carry no Event markup at all during their grace window.
+		if ( '1' === get_post_meta( $post_id, '_pe_cancelled', true ) ) {
 			$event_status = 'https://schema.org/EventCancelled';
-		} elseif ( 'publish' === $status ) {
+		} elseif ( 'publish' === $status && ! pe_event_is_past( $post_id ) ) {
 			$event_status = 'https://schema.org/EventScheduled';
 		} else {
 			return;

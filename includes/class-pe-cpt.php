@@ -95,6 +95,7 @@ class PE_CPT {
 			'_pe_field_hashes',
 			'_pe_override',
 			'_pe_featured',
+			'_pe_cancelled',
 			'_pe_sync_note',
 		);
 		foreach ( $string_keys as $key ) {
