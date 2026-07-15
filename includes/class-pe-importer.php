@@ -216,6 +216,7 @@ class PE_Importer {
 					)
 				);
 				delete_post_meta( $post_id, '_pe_removed_at' );
+				delete_post_meta( $post_id, '_pe_redirect_url' );
 				update_post_meta( $post_id, '_pe_sync_note', 'restored' );
 				$run['restored']++;
 			}
@@ -337,6 +338,22 @@ class PE_Importer {
 				)
 			);
 			update_post_meta( $post_id, '_pe_removed_at', time() );
+
+			// A post delisted because a suppression rule with a link URL now
+			// covers its series (e.g. Mass moved to the mass-times page)
+			// keeps working for saved/indexed links: its permalink 301s to
+			// the rule's URL instead of showing a notice and later a 410.
+			$rule = pe_suppression_rule(
+				get_post_meta( $post_id, '_pe_ccb_event_id', true ),
+				get_the_title( $post_id ),
+				PE_Settings::get_all()
+			);
+			if ( null !== $rule && '' !== $rule['url'] ) {
+				update_post_meta( $post_id, '_pe_redirect_url', $rule['url'] );
+			} else {
+				delete_post_meta( $post_id, '_pe_redirect_url' );
+			}
+
 			$run['removed']++;
 		}
 	}

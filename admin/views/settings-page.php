@@ -45,7 +45,7 @@ $pe_run_log  = get_option( 'pe_run_log', array() );
 				<td>
 					<textarea id="pe_suppress_ids" class="small-text code" rows="5" style="width:20em"
 						name="<?php echo esc_attr( PE_Settings::OPTION ); ?>[suppress_ids]"><?php echo esc_textarea( PE_Settings::to_textarea( 'suppress_ids' ) ); ?></textarea>
-					<p class="description"><?php echo esc_html( 'One rule per line: ID | link URL   (URL optional). These series never create posts, but still appear on the calendar linking to the URL — e.g. the Mass times page. The ID is shown in each event\'s "Parish Event Sync" box.' ); ?></p>
+					<p class="description"><?php echo esc_html( 'One rule per line: ID | link URL   (URL optional). These series never create posts, but still appear on the calendar linking to the URL — e.g. the Mass times page. Existing posts for a newly-suppressed series are delisted and their old links redirect to the URL. The ID is shown in each event\'s "Parish Event Sync" box.' ); ?></p>
 				</td>
 			</tr>
 			<tr>

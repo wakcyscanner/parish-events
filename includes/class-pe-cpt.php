@@ -112,6 +112,20 @@ class PE_CPT {
 			);
 		}
 
+		// Set by reconcile when a linked suppression rule delists the post;
+		// its permalink 301s here for saved/indexed links.
+		register_post_meta(
+			self::POST_TYPE,
+			'_pe_redirect_url',
+			array(
+				'type'              => 'string',
+				'single'            => true,
+				'show_in_rest'      => false,
+				'sanitize_callback' => 'esc_url_raw',
+				'auth_callback'     => '__return_false',
+			)
+		);
+
 		// Admin-owned like the featured image: imports never write it, and it
 		// is editable regardless of the override flag.
 		register_post_meta(

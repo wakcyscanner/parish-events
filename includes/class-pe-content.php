@@ -45,7 +45,9 @@ class PE_Content {
 			$post
 			&& PE_CPT::POST_TYPE === $post->post_type
 			&& PE_CPT::STATUS_REMOVED === $post->post_status
-			&& ! self::in_cancelled_grace( $post->ID )
+			// Redirect posts are gone from REST immediately (their content
+			// lives at the redirect target); others get the grace window.
+			&& ( '' !== get_post_meta( $post->ID, '_pe_redirect_url', true ) || ! self::in_cancelled_grace( $post->ID ) )
 			&& ! current_user_can( 'edit_post', $post->ID )
 		) {
 			return new WP_Error(
@@ -73,14 +75,26 @@ class PE_Content {
 	}
 
 	/**
-	 * After the grace window, a removed event's URL is permanently gone.
+	 * Removed events: posts delisted by a linked suppression rule redirect
+	 * their saved/indexed URLs to the rule's destination permanently; all
+	 * other removed events are gone after the grace window.
 	 */
 	public static function gone_after_grace() {
 		if ( ! is_singular( PE_CPT::POST_TYPE ) ) {
 			return;
 		}
 		$post = get_queried_object();
-		if ( $post && PE_CPT::STATUS_REMOVED === $post->post_status && ! self::in_cancelled_grace( $post->ID ) ) {
+		if ( ! $post || PE_CPT::STATUS_REMOVED !== $post->post_status ) {
+			return;
+		}
+
+		$redirect = get_post_meta( $post->ID, '_pe_redirect_url', true );
+		if ( '' !== $redirect ) {
+			wp_redirect( esc_url_raw( $redirect ), 301 ); // phpcs:ignore WordPress.Security.SafeRedirect -- admin-configured destination, sanitized on save.
+			exit;
+		}
+
+		if ( ! self::in_cancelled_grace( $post->ID ) ) {
 			status_header( 410 );
 			nocache_headers();
 			include get_404_template();
