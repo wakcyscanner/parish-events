@@ -96,6 +96,12 @@ class PE_JsonLD {
 			$image = $settings['default_image'];
 		}
 
+		// The flyer often carries the richest artwork; offer it alongside.
+		$flyer_id = (int) get_post_meta( $post_id, '_pe_flyer_id', true );
+		if ( $flyer_id && wp_attachment_is_image( $flyer_id ) ) {
+			$image = array_values( array_filter( array( $image, wp_get_attachment_image_url( $flyer_id, 'full' ) ) ) );
+		}
+
 		$excerpt     = trim( wp_strip_all_tags( get_post_field( 'post_content', $post_id ) ) );
 		$description = '' !== $excerpt
 			? wp_trim_words( $excerpt, 40 )

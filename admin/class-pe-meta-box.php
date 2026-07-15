@@ -12,6 +12,23 @@ class PE_Meta_Box {
 	public static function init() {
 		add_action( 'add_meta_boxes_' . PE_CPT::POST_TYPE, array( __CLASS__, 'add' ) );
 		add_action( 'save_post_' . PE_CPT::POST_TYPE, array( __CLASS__, 'save' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_media' ) );
+	}
+
+	/**
+	 * The flyer field uses the media-library picker; the block editor loads
+	 * wp.media on its own, but the classic editor needs it enqueued.
+	 *
+	 * @param string $hook Current admin page hook.
+	 */
+	public static function enqueue_media( $hook ) {
+		if ( 'post.php' !== $hook && 'post-new.php' !== $hook ) {
+			return;
+		}
+		$screen = get_current_screen();
+		if ( $screen && PE_CPT::POST_TYPE === $screen->post_type ) {
+			wp_enqueue_media();
+		}
 	}
 
 	public static function add() {
@@ -114,6 +131,61 @@ class PE_Meta_Box {
 				<br><span style="color:#b32d2e;"><?php esc_html_e( 'This does not look like a YouTube or Vimeo link, so no video will be shown.', 'parish-events' ); ?></span>
 			<?php endif; ?>
 		</p>
+		<p>
+			<?php
+			$flyer_id = (int) get_post_meta( $post->ID, '_pe_flyer_id', true );
+			if ( $flyer_id && ! wp_attachment_is_image( $flyer_id ) ) {
+				$flyer_id = 0;
+			}
+			?>
+			<strong><?php esc_html_e( 'Event flyer', 'parish-events' ); ?></strong><br>
+			<span id="pe-flyer-preview"><?php echo $flyer_id ? wp_get_attachment_image( $flyer_id, 'medium', false, array( 'style' => 'max-width:100%;height:auto;' ) ) : ''; ?></span>
+			<input type="hidden" name="pe_flyer_id" id="pe-flyer-id" value="<?php echo esc_attr( $flyer_id ? $flyer_id : '' ); ?>">
+			<button type="button" class="button" id="pe-flyer-select"><?php $flyer_id ? esc_html_e( 'Change flyer', 'parish-events' ) : esc_html_e( 'Select flyer', 'parish-events' ); ?></button>
+			<button type="button" class="button" id="pe-flyer-remove" <?php echo $flyer_id ? '' : 'style="display:none;"'; ?>><?php esc_html_e( 'Remove flyer', 'parish-events' ); ?></button><br>
+			<span class="description"><?php esc_html_e( 'A flyer or bulletin snippet image, shown below the event details on the event page. Like the featured image, imports never change it — override or not.', 'parish-events' ); ?></span>
+		</p>
+		<script>
+		( function () {
+			var selectBtn = document.getElementById( 'pe-flyer-select' );
+			var removeBtn = document.getElementById( 'pe-flyer-remove' );
+			var input     = document.getElementById( 'pe-flyer-id' );
+			var preview   = document.getElementById( 'pe-flyer-preview' );
+			var frame;
+			if ( ! selectBtn || ! window.wp || ! wp.media ) {
+				return;
+			}
+			selectBtn.addEventListener( 'click', function () {
+				if ( ! frame ) {
+					frame = wp.media( {
+						title: <?php echo wp_json_encode( __( 'Select event flyer', 'parish-events' ) ); ?>,
+						library: { type: 'image' },
+						multiple: false
+					} );
+					frame.on( 'select', function () {
+						var att = frame.state().get( 'selection' ).first().toJSON();
+						var url = ( att.sizes && att.sizes.medium ) ? att.sizes.medium.url : att.url;
+						input.value = att.id;
+						preview.innerHTML = '';
+						var img = document.createElement( 'img' );
+						img.src = url;
+						img.style.maxWidth = '100%';
+						img.style.height = 'auto';
+						preview.appendChild( img );
+						selectBtn.textContent = <?php echo wp_json_encode( __( 'Change flyer', 'parish-events' ) ); ?>;
+						removeBtn.style.display = '';
+					} );
+				}
+				frame.open();
+			} );
+			removeBtn.addEventListener( 'click', function () {
+				input.value = '';
+				preview.innerHTML = '';
+				selectBtn.textContent = <?php echo wp_json_encode( __( 'Select flyer', 'parish-events' ) ); ?>;
+				removeBtn.style.display = 'none';
+			} );
+		} )();
+		</script>
 
 		<?php if ( $uid ) : ?>
 			<hr>
@@ -198,8 +270,17 @@ class PE_Meta_Box {
 			delete_post_meta( $post_id, '_pe_removed_at' );
 		}
 
-		// Saved before the override gate below: the video slot is admin-owned
-		// regardless of override status, like the featured image.
+		// Saved before the override gate below: the video and flyer slots are
+		// admin-owned regardless of override status, like the featured image.
+		if ( isset( $_POST['pe_flyer_id'] ) ) {
+			$flyer_id = absint( $_POST['pe_flyer_id'] );
+			if ( $flyer_id && wp_attachment_is_image( $flyer_id ) ) {
+				update_post_meta( $post_id, '_pe_flyer_id', $flyer_id );
+			} else {
+				delete_post_meta( $post_id, '_pe_flyer_id' );
+			}
+		}
+
 		if ( isset( $_POST['pe_video_url'] ) ) {
 			$video_url = esc_url_raw( trim( wp_unslash( $_POST['pe_video_url'] ) ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 			if ( '' === $video_url ) {

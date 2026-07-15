@@ -144,6 +144,20 @@ class PE_Content {
 			$html .= '</p>';
 		}
 
+		// Flyer image below the details card, linked to the full-size file.
+		// Admin-owned like the featured image: renders regardless of override.
+		$flyer_id = (int) get_post_meta( $post_id, '_pe_flyer_id', true );
+		if ( $flyer_id && wp_attachment_is_image( $flyer_id ) ) {
+			$attrs = array( 'loading' => 'lazy' );
+			if ( '' === trim( (string) get_post_meta( $flyer_id, '_wp_attachment_image_alt', true ) ) ) {
+				/* translators: %s: event title. */
+				$attrs['alt'] = sprintf( __( 'Flyer for %s', 'parish-events' ), get_the_title( $post_id ) );
+			}
+			$html .= '<figure class="pe-event-flyer"><a href="' . esc_url( wp_get_attachment_image_url( $flyer_id, 'full' ) ) . '">'
+				. wp_get_attachment_image( $flyer_id, 'large', false, $attrs )
+				. '</a></figure>';
+		}
+
 		// The linkify + kses pipeline exists for import-owned plain text.
 		// Admin-authored content (override on, manually created, or block
 		// markup) has already been through the editor's own sanitization and
