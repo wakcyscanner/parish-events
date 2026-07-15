@@ -97,6 +97,16 @@ class PE_Meta_Box {
 			</label><br>
 			<span class="description"><?php esc_html_e( 'Shown in the featured events cards. The featured image can always be set, override or not.', 'parish-events' ); ?></span>
 		</p>
+		<p>
+			<?php $video_url = get_post_meta( $post->ID, '_pe_video_url', true ); ?>
+			<label><strong><?php esc_html_e( 'Featured video URL', 'parish-events' ); ?></strong><br>
+				<input type="url" class="widefat" name="pe_video_url" value="<?php echo esc_attr( $video_url ); ?>" placeholder="https://youtu.be/…">
+			</label><br>
+			<span class="description"><?php esc_html_e( 'A YouTube or Vimeo link, shown above the event details on the event page. Like the featured image, imports never change it — override or not.', 'parish-events' ); ?></span>
+			<?php if ( '' !== $video_url && '' === pe_video_embed_url( $video_url ) ) : ?>
+				<br><span style="color:#b32d2e;"><?php esc_html_e( 'This does not look like a YouTube or Vimeo link, so no video will be shown.', 'parish-events' ); ?></span>
+			<?php endif; ?>
+		</p>
 
 		<?php if ( $uid ) : ?>
 			<hr>
@@ -163,6 +173,17 @@ class PE_Meta_Box {
 		$override     = empty( $_POST['pe_override'] ) ? '0' : '1';
 		update_post_meta( $post_id, '_pe_override', $override );
 		update_post_meta( $post_id, '_pe_featured', empty( $_POST['pe_featured'] ) ? '0' : '1' );
+
+		// Saved before the override gate below: the video slot is admin-owned
+		// regardless of override status, like the featured image.
+		if ( isset( $_POST['pe_video_url'] ) ) {
+			$video_url = esc_url_raw( trim( wp_unslash( $_POST['pe_video_url'] ) ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			if ( '' === $video_url ) {
+				delete_post_meta( $post_id, '_pe_video_url' );
+			} else {
+				update_post_meta( $post_id, '_pe_video_url', $video_url );
+			}
+		}
 
 		// Turning override off must force a full re-sync on the next import;
 		// otherwise an unchanged feed hash would leave the manual edits in

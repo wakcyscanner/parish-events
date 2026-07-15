@@ -106,6 +106,12 @@ class PE_Content {
 			$html .= '<div class="pe-cancelled-banner">' . esc_html__( 'This event has been cancelled.', 'parish-events' ) . '</div>';
 		}
 
+		// Featured video promotes the event from above the details card.
+		$embed = pe_video_embed_url( get_post_meta( $post_id, '_pe_video_url', true ) );
+		if ( '' !== $embed ) {
+			$html .= '<div class="pe-featured-video"><iframe src="' . esc_url( $embed ) . '" title="' . esc_attr( get_the_title( $post_id ) ) . '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+		}
+
 		$html .= self::render_header_block( $post_id );
 
 		// Add-to-calendar buttons for upcoming, published events.

@@ -166,6 +166,49 @@ function pe_location_html( $location ) {
 }
 
 /**
+ * Convert a YouTube or Vimeo page URL into a privacy-friendly embed URL.
+ *
+ * Accepts the URL shapes people actually paste: youtube.com/watch?v=,
+ * youtu.be/, youtube.com/shorts|embed|live/, vimeo.com/<id>, and
+ * player.vimeo.com/video/<id>. Anything else returns '' and nothing renders.
+ *
+ * @param string $url Pasted video URL.
+ * @return string Embed URL, or '' when unrecognized.
+ */
+function pe_video_embed_url( $url ) {
+	$url = trim( (string) $url );
+	if ( '' === $url ) {
+		return '';
+	}
+
+	$host = strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) );
+	$host = preg_replace( '/^(www|m)\./', '', $host );
+	$path = (string) wp_parse_url( $url, PHP_URL_PATH );
+
+	$youtube_id = '';
+	if ( in_array( $host, array( 'youtube.com', 'youtube-nocookie.com' ), true ) ) {
+		parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
+		if ( ! empty( $query['v'] ) ) {
+			$youtube_id = $query['v'];
+		} elseif ( preg_match( '#^/(?:shorts|embed|live)/([A-Za-z0-9_-]{6,20})#', $path, $m ) ) {
+			$youtube_id = $m[1];
+		}
+	} elseif ( 'youtu.be' === $host && preg_match( '#^/([A-Za-z0-9_-]{6,20})#', $path, $m ) ) {
+		$youtube_id = $m[1];
+	}
+	if ( '' !== $youtube_id && preg_match( '/^[A-Za-z0-9_-]{6,20}$/', $youtube_id ) ) {
+		return 'https://www.youtube-nocookie.com/embed/' . $youtube_id;
+	}
+
+	if ( in_array( $host, array( 'vimeo.com', 'player.vimeo.com' ), true )
+		&& preg_match( '#^/(?:video/)?(\d{6,12})(?:$|[/?])#', $path, $m ) ) {
+		return 'https://player.vimeo.com/video/' . $m[1] . '?dnt=1';
+	}
+
+	return '';
+}
+
+/**
  * Format HH:MM:SS as a human-readable time. Port of formatTime()
  * (calendar.js:917).
  *

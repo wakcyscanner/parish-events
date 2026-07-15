@@ -111,6 +111,20 @@ class PE_CPT {
 			);
 		}
 
+		// Admin-owned like the featured image: imports never write it, and it
+		// is editable regardless of the override flag.
+		register_post_meta(
+			self::POST_TYPE,
+			'_pe_video_url',
+			array(
+				'type'              => 'string',
+				'single'            => true,
+				'show_in_rest'      => false,
+				'sanitize_callback' => 'esc_url_raw',
+				'auth_callback'     => '__return_false',
+			)
+		);
+
 		foreach ( array( '_pe_last_seen', '_pe_removed_at' ) as $key ) {
 			register_post_meta(
 				self::POST_TYPE,
