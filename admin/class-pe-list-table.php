@@ -13,6 +13,8 @@ class PE_List_Table {
 		add_filter( 'manage_' . PE_CPT::POST_TYPE . '_posts_columns', array( __CLASS__, 'columns' ) );
 		add_action( 'manage_' . PE_CPT::POST_TYPE . '_posts_custom_column', array( __CLASS__, 'render_column' ), 10, 2 );
 		add_filter( 'manage_edit-' . PE_CPT::POST_TYPE . '_sortable_columns', array( __CLASS__, 'sortable_columns' ) );
+		add_action( 'restrict_manage_posts', array( __CLASS__, 'filter_controls' ) );
+		add_filter( 'months_dropdown_results', array( __CLASS__, 'remove_core_months_dropdown' ), 10, 2 );
 		add_action( 'pre_get_posts', array( __CLASS__, 'order_and_filter' ) );
 		add_filter( 'display_post_states', array( __CLASS__, 'post_states' ), 10, 2 );
 		add_action( 'admin_footer-post.php', array( __CLASS__, 'status_dropdown_script' ) );
@@ -93,6 +95,117 @@ class PE_List_Table {
 	}
 
 	/**
+	 * Distinct event months (YYYY-MM) present in the data, oldest first.
+	 *
+	 * @return string[]
+	 */
+	private static function event_months() {
+		global $wpdb;
+		return $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT DISTINCT LEFT( pm.meta_value, 7 )
+				 FROM {$wpdb->postmeta} pm
+				 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+				 WHERE pm.meta_key = '_pe_event_date'
+				   AND pm.meta_value <> ''
+				   AND p.post_type = %s
+				 ORDER BY 1 ASC",
+				PE_CPT::POST_TYPE
+			)
+		);
+	}
+
+	/**
+	 * Distinct group names present in the data, alphabetical.
+	 *
+	 * @return string[]
+	 */
+	private static function event_groups() {
+		global $wpdb;
+		return $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT DISTINCT pm.meta_value
+				 FROM {$wpdb->postmeta} pm
+				 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+				 WHERE pm.meta_key = '_pe_group_name'
+				   AND pm.meta_value <> ''
+				   AND p.post_type = %s
+				 ORDER BY pm.meta_value ASC",
+				PE_CPT::POST_TYPE
+			)
+		);
+	}
+
+	/**
+	 * Core's "All dates" dropdown filters by publish date, which is
+	 * meaningless for imported events — the event-month filter replaces it.
+	 *
+	 * @param object[] $months    Month objects for the dropdown.
+	 * @param string   $post_type Current list-table post type.
+	 * @return object[]
+	 */
+	public static function remove_core_months_dropdown( $months, $post_type ) {
+		return PE_CPT::POST_TYPE === $post_type ? array() : $months;
+	}
+
+	/**
+	 * Month / group / timeframe dropdowns in the list-table filter bar.
+	 *
+	 * @param string $post_type Current list-table post type.
+	 */
+	public static function filter_controls( $post_type ) {
+		if ( PE_CPT::POST_TYPE !== $post_type ) {
+			return;
+		}
+
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only list filters, matches core behavior.
+		$month = isset( $_GET['pe_month'] ) ? sanitize_text_field( wp_unslash( $_GET['pe_month'] ) ) : '';
+		$group = isset( $_GET['pe_group'] ) ? sanitize_text_field( wp_unslash( $_GET['pe_group'] ) ) : '';
+		$when  = isset( $_GET['pe_when'] ) ? sanitize_key( $_GET['pe_when'] ) : '';
+		// phpcs:enable
+
+		echo '<select name="pe_month">';
+		echo '<option value="">' . esc_html__( 'All event months', 'parish-events' ) . '</option>';
+		foreach ( self::event_months() as $m ) {
+			printf(
+				'<option value="%s"%s>%s</option>',
+				esc_attr( $m ),
+				selected( $month, $m, false ),
+				esc_html( wp_date( 'F Y', strtotime( $m . '-01T12:00:00' ), pe_timezone() ) )
+			);
+		}
+		echo '</select>';
+
+		echo '<select name="pe_group">';
+		echo '<option value="">' . esc_html__( 'All groups', 'parish-events' ) . '</option>';
+		foreach ( self::event_groups() as $g ) {
+			printf(
+				'<option value="%s"%s>%s</option>',
+				esc_attr( $g ),
+				selected( $group, $g, false ),
+				esc_html( $g )
+			);
+		}
+		echo '</select>';
+
+		$timeframes = array(
+			''         => __( 'All dates', 'parish-events' ),
+			'upcoming' => __( 'Upcoming only', 'parish-events' ),
+			'past'     => __( 'Past only', 'parish-events' ),
+		);
+		echo '<select name="pe_when">';
+		foreach ( $timeframes as $value => $label ) {
+			printf(
+				'<option value="%s"%s>%s</option>',
+				esc_attr( $value ),
+				selected( $when, $value, false ),
+				esc_html( $label )
+			);
+		}
+		echo '</select>';
+	}
+
+	/**
 	 * Default-sort the admin list by event date and support the
 	 * pe_sync_note filter link used by the review notice.
 	 *
@@ -101,6 +214,14 @@ class PE_List_Table {
 	public static function order_and_filter( $query ) {
 		if ( ! is_admin() || ! $query->is_main_query() || PE_CPT::POST_TYPE !== $query->get( 'post_type' ) ) {
 			return;
+		}
+
+		// pe_removed is registered public (required for the front-end grace
+		// window), and WP_Query folds every public status into the admin "All"
+		// list — ignoring show_in_admin_all_list. Pin the status list so
+		// removed events only appear under their own status view.
+		if ( '' === $query->get( 'post_status' ) ) {
+			$query->set( 'post_status', array_values( get_post_stati( array( 'show_in_admin_all_list' => true ) ) ) );
 		}
 
 		$orderby = $query->get( 'orderby' );
@@ -112,13 +233,46 @@ class PE_List_Table {
 			}
 		}
 
-		// meta_query (not meta_key) so it can coexist with the sort clause.
-		if ( isset( $_GET['pe_sync_note'] ) && 'missing_upstream' === $_GET['pe_sync_note'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$meta_query   = (array) $query->get( 'meta_query' );
+		// meta_query (not meta_key) so the filters can coexist with the sort
+		// clause and with each other.
+		$meta_query = (array) $query->get( 'meta_query' );
+
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only list filters, matches core behavior.
+		if ( isset( $_GET['pe_sync_note'] ) && 'missing_upstream' === $_GET['pe_sync_note'] ) {
 			$meta_query[] = array(
 				'key'   => '_pe_sync_note',
 				'value' => 'missing_upstream',
 			);
+		}
+
+		$month = isset( $_GET['pe_month'] ) ? sanitize_text_field( wp_unslash( $_GET['pe_month'] ) ) : '';
+		if ( preg_match( '/^\d{4}-\d{2}$/', $month ) ) {
+			$meta_query[] = array(
+				'key'     => '_pe_event_date',
+				'value'   => array( $month . '-01', $month . '-31' ),
+				'compare' => 'BETWEEN',
+			);
+		}
+
+		$group = isset( $_GET['pe_group'] ) ? sanitize_text_field( wp_unslash( $_GET['pe_group'] ) ) : '';
+		if ( '' !== $group ) {
+			$meta_query[] = array(
+				'key'   => '_pe_group_name',
+				'value' => $group,
+			);
+		}
+
+		$when = isset( $_GET['pe_when'] ) ? sanitize_key( $_GET['pe_when'] ) : '';
+		if ( 'upcoming' === $when || 'past' === $when ) {
+			$meta_query[] = array(
+				'key'     => '_pe_event_date',
+				'value'   => pe_today(),
+				'compare' => 'upcoming' === $when ? '>=' : '<',
+			);
+		}
+		// phpcs:enable
+
+		if ( count( $meta_query ) > 0 ) {
 			$query->set( 'meta_query', $meta_query );
 		}
 	}
