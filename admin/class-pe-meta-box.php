@@ -152,10 +152,15 @@ class PE_Meta_Box {
 			var input     = document.getElementById( 'pe-flyer-id' );
 			var preview   = document.getElementById( 'pe-flyer-preview' );
 			var frame;
-			if ( ! selectBtn || ! window.wp || ! wp.media ) {
+			if ( ! selectBtn ) {
 				return;
 			}
 			selectBtn.addEventListener( 'click', function () {
+				// wp.media loads with the footer scripts, well after this
+				// inline script runs — it can only be checked at click time.
+				if ( ! window.wp || ! wp.media ) {
+					return;
+				}
 				if ( ! frame ) {
 					frame = wp.media( {
 						title: <?php echo wp_json_encode( __( 'Select event flyer', 'parish-events' ) ); ?>,
