@@ -55,6 +55,8 @@ Installable zips are published under [Releases](../../releases).
 3. Activate. The plugin flushes rewrite rules on activation; if event URLs 404, re-save Settings → Permalinks once.
 4. Configure Parish Events → Settings: feed URL, schedule, suppression rules, location directory, and alert emails.
 
+After the initial install, updates arrive like any other plugin: the plugin checks this repo's Releases and offers new versions on the Plugins screen, where they can be installed in one click (or auto-updated, if enabled).
+
 ## Launch checklist
 
 1. The plugin claims the `/events/` URL base for event posts. If another plugin or page already serves `/events/`, resolve that first: deactivate the conflicting plugin, or keep a page at `/events/` and put the `[parish_events_calendar]` shortcode in it — the page URL and the post type coexist.

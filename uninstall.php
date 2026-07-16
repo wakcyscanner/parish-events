@@ -29,6 +29,7 @@ delete_option( 'pe_settings' );
 delete_option( 'pe_run_log' );
 delete_option( 'pe_cache_ver' );
 delete_option( 'pe_installed_version' );
+delete_transient( 'pe_update_check' );
 delete_option( 'pe_import_lock' );
 delete_option( 'pe_linked_occurrences' );
 delete_option( 'pe_fail_streak' );

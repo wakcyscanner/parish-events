@@ -28,6 +28,7 @@ class PE_Plugin {
 		PE_ICS::init();
 		PE_Shortcodes::init();
 		PE_Cache::init();
+		PE_Updater::init();
 		add_action( 'widgets_init', array( 'PE_Upcoming_Widget', 'register' ) );
 
 		if ( is_admin() ) {

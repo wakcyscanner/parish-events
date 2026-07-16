@@ -3,19 +3,20 @@
  * Plugin Name:       Parish Events
  * Plugin URI:        https://github.com/wakcyscanner/stpacc-calendar
  * Description:       Imports parish calendar events from the CCB feed into a custom post type with scheduled sync, manual overrides, structured data, and display shortcodes.
- * Version:           1.0.9
+ * Version:           1.0.10
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            St. Paul the Apostle Catholic Church
  * License:           GPL-2.0-or-later
  * Text Domain:       parish-events
+ * Update URI:        https://github.com/wakcyscanner/parish-events
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PE_VERSION', '1.0.9' );
+define( 'PE_VERSION', '1.0.10' );
 define( 'PE_PLUGIN_FILE', __FILE__ );
 define( 'PE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -32,6 +33,7 @@ require_once PE_PLUGIN_DIR . 'includes/class-pe-meta-tags.php';
 require_once PE_PLUGIN_DIR . 'includes/class-pe-ics.php';
 require_once PE_PLUGIN_DIR . 'includes/class-pe-shortcodes.php';
 require_once PE_PLUGIN_DIR . 'includes/class-pe-cache.php';
+require_once PE_PLUGIN_DIR . 'includes/class-pe-updater.php';
 require_once PE_PLUGIN_DIR . 'includes/class-pe-widget.php';
 require_once PE_PLUGIN_DIR . 'includes/class-pe-cli.php';
 require_once PE_PLUGIN_DIR . 'includes/class-pe-plugin.php';
