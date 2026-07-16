@@ -139,10 +139,14 @@ class PE_Importer {
 					return strcmp( $a['date'] . $a['start_time'], $b['date'] . $b['start_time'] );
 				}
 			);
-			update_option( 'pe_linked_occurrences', $linked, false );
+			$linked_changed = update_option( 'pe_linked_occurrences', $linked, false );
 
-			// Invalidate shortcode fragment caches.
-			update_option( 'pe_cache_ver', (int) get_option( 'pe_cache_ver', 0 ) + 1 );
+			// Invalidate shortcode fragment caches — and, via PE_Cache,
+			// full-page caches — but only when the run actually changed
+			// something, so routine no-op imports don't purge the site cache.
+			if ( $linked_changed || $run['created'] || $run['updated'] || $run['removed'] || $run['restored'] ) {
+				update_option( 'pe_cache_ver', (int) get_option( 'pe_cache_ver', 0 ) + 1 );
+			}
 		} finally {
 			delete_option( self::LOCK_OPTION );
 		}
