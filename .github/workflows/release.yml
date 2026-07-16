@@ -1,0 +1,53 @@
+name: Release
+
+# Pushing a version tag (v1.0.9, v1.1.0, ...) builds an installable plugin
+# zip and publishes it as a GitHub Release. The tag must match the Version
+# header in parish-events.php.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check tag matches plugin version
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if ! grep -q "^ \* Version:           ${version}$" parish-events.php; then
+            echo "Tag ${GITHUB_REF_NAME} does not match the Version header in parish-events.php" >&2
+            grep '^ \* Version:' parish-events.php >&2
+            exit 1
+          fi
+          if ! grep -q "define( 'PE_VERSION', '${version}' );" parish-events.php; then
+            echo "Tag ${GITHUB_REF_NAME} does not match PE_VERSION in parish-events.php" >&2
+            exit 1
+          fi
+
+      - name: Build plugin zip
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          mkdir -p dist/parish-events
+          rsync -a \
+            --exclude='.git*' \
+            --exclude='.github' \
+            --exclude='tests' \
+            --exclude='dist' \
+            --exclude='.wp-env.json' \
+            ./ dist/parish-events/
+          cd dist
+          zip -r "parish-events-${version}.zip" parish-events
+          unzip -l "parish-events-${version}.zip"
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/parish-events-*.zip
+          generate_release_notes: true
