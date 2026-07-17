@@ -96,6 +96,7 @@ class PE_CPT {
 			'_pe_override',
 			'_pe_featured',
 			'_pe_cancelled',
+			'_pe_cost',
 			'_pe_sync_note',
 		);
 		foreach ( $string_keys as $key ) {
@@ -126,8 +127,22 @@ class PE_CPT {
 			)
 		);
 
+		// Registration/RSVP/tickets link — the feed has no field for this.
 		// Admin-owned like the featured image: imports never write it, and it
-		// is editable regardless of the override flag.
+		// is editable regardless of the override flag (as are _pe_cost above
+		// and _pe_video_url below).
+		register_post_meta(
+			self::POST_TYPE,
+			'_pe_registration_url',
+			array(
+				'type'              => 'string',
+				'single'            => true,
+				'show_in_rest'      => false,
+				'sanitize_callback' => 'esc_url_raw',
+				'auth_callback'     => '__return_false',
+			)
+		);
+
 		register_post_meta(
 			self::POST_TYPE,
 			'_pe_video_url',

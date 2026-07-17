@@ -26,7 +26,7 @@ Installable zips are published under [Releases](../../releases).
 ### Editorial control
 
 - **Manual override** flag per event: imports stop touching every field, and the date, times, location, group, and type become editable alongside the content (block editor supported).
-- Always editable, override or not: featured image, featured flag, cancelled flag, a **featured video** slot (YouTube/Vimeo URL shown above the details), and an **event flyer** image slot (shown below the details, linked to full size).
+- Always editable, override or not: featured image, featured flag, cancelled flag, a **featured video** slot (YouTube/Vimeo URL shown above the details), an **event flyer** image slot (shown below the details, linked to full size), a **registration/RSVP link** (shown as a button; the feed has no sign-up field), and an optional **cost** field (shown in the details and reflected in structured data).
 - Admin list table with event date sorting, sync-status column, flag icons, and filters by event month, group, and upcoming/past.
 
 ### Suppression & locations

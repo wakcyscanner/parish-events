@@ -82,6 +82,9 @@ class PE_List_Table {
 				if ( 0 !== (int) get_post_meta( $post_id, '_pe_flyer_id', true ) ) {
 					echo '<span class="dashicons dashicons-format-image" title="' . esc_attr__( 'Event flyer', 'parish-events' ) . '"></span>';
 				}
+				if ( '' !== get_post_meta( $post_id, '_pe_registration_url', true ) ) {
+					echo '<span class="dashicons dashicons-tickets-alt" title="' . esc_attr__( 'Registration link', 'parish-events' ) . '"></span>';
+				}
 				if ( '1' === get_post_meta( $post_id, '_pe_cancelled', true ) ) {
 					echo '<span class="dashicons dashicons-dismiss" title="' . esc_attr__( 'Cancelled', 'parish-events' ) . '"></span>';
 				}

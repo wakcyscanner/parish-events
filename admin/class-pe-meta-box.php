@@ -132,6 +132,18 @@ class PE_Meta_Box {
 			<?php endif; ?>
 		</p>
 		<p>
+			<label><strong><?php esc_html_e( 'Registration / RSVP link', 'parish-events' ); ?></strong><br>
+				<input type="url" class="widefat" name="pe_registration_url" value="<?php echo esc_attr( get_post_meta( $post->ID, '_pe_registration_url', true ) ); ?>" placeholder="https://…">
+			</label><br>
+			<span class="description"><?php esc_html_e( 'Shown as a "Register / RSVP" button on the event page. The parish calendar feed has no registration field, so imports never change this.', 'parish-events' ); ?></span>
+		</p>
+		<p>
+			<label><strong><?php esc_html_e( 'Cost', 'parish-events' ); ?></strong><br>
+				<input type="text" class="widefat" name="pe_cost" value="<?php echo esc_attr( get_post_meta( $post->ID, '_pe_cost', true ) ); ?>" placeholder="<?php esc_attr_e( 'e.g. $10, $25 per family, Free-will offering', 'parish-events' ); ?>">
+			</label><br>
+			<span class="description"><?php esc_html_e( 'Optional; shown in the event details. Leave blank for free events. Imports never change this.', 'parish-events' ); ?></span>
+		</p>
+		<p>
 			<?php
 			$flyer_id = (int) get_post_meta( $post->ID, '_pe_flyer_id', true );
 			if ( $flyer_id && ! wp_attachment_is_image( $flyer_id ) ) {
@@ -292,6 +304,26 @@ class PE_Meta_Box {
 				delete_post_meta( $post_id, '_pe_video_url' );
 			} else {
 				update_post_meta( $post_id, '_pe_video_url', $video_url );
+			}
+		}
+
+		if ( isset( $_POST['pe_registration_url'] ) ) {
+			$reg_url = esc_url_raw( trim( wp_unslash( $_POST['pe_registration_url'] ) ), array( 'http', 'https' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			// esc_url_raw happily mangles junk into a "URL" (http://not%20a%20url);
+			// wp_http_validate_url rejects what a visitor couldn't actually open.
+			if ( '' === $reg_url || false === wp_http_validate_url( $reg_url ) ) {
+				delete_post_meta( $post_id, '_pe_registration_url' );
+			} else {
+				update_post_meta( $post_id, '_pe_registration_url', $reg_url );
+			}
+		}
+
+		if ( isset( $_POST['pe_cost'] ) ) {
+			$cost = sanitize_text_field( wp_unslash( $_POST['pe_cost'] ) );
+			if ( '' === $cost ) {
+				delete_post_meta( $post_id, '_pe_cost' );
+			} else {
+				update_post_meta( $post_id, '_pe_cost', $cost );
 			}
 		}
 

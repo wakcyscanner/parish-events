@@ -116,6 +116,28 @@ class PE_JsonLD {
 				'zip'    => '43082',
 			);
 
+		// Admin-set cost and registration link feed the Offer. Cost is free
+		// text ("$10", "$25 per family", "Free-will offering"): the first
+		// number becomes the price; no number plus "free" (or no cost at all)
+		// means a free event; otherwise the price is left unstated.
+		$cost       = (string) get_post_meta( $post_id, '_pe_cost', true );
+		$reg_url    = (string) get_post_meta( $post_id, '_pe_registration_url', true );
+		$has_amount = (bool) preg_match( '/(\d+(?:\.\d{1,2})?)/', str_replace( ',', '', $cost ), $amount );
+		$is_free    = '' === $cost || ( ! $has_amount && false !== stripos( $cost, 'free' ) );
+
+		$offer = array(
+			'@type'        => 'Offer',
+			'availability' => 'https://schema.org/InStock',
+			'url'          => '' !== $reg_url ? $reg_url : get_permalink( $post_id ),
+		);
+		if ( $has_amount ) {
+			$offer['price']         = $amount[1];
+			$offer['priceCurrency'] = 'USD';
+		} elseif ( $is_free ) {
+			$offer['price']         = '0';
+			$offer['priceCurrency'] = 'USD';
+		}
+
 		return array(
 			'@context'            => 'https://schema.org',
 			'@type'               => 'Event',
@@ -127,15 +149,9 @@ class PE_JsonLD {
 			'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
 			'eventStatus'         => $event_status,
 			'url'                 => get_permalink( $post_id ),
-			'isAccessibleForFree' => true,
+			'isAccessibleForFree' => $is_free,
 			'inLanguage'          => 'en',
-			'offers'              => array(
-				'@type'         => 'Offer',
-				'price'         => '0',
-				'priceCurrency' => 'USD',
-				'availability'  => 'https://schema.org/InStock',
-				'url'           => get_permalink( $post_id ),
-			),
+			'offers'              => $offer,
 			'location'            => array(
 				'@type'   => 'Place',
 				'name'    => $location ? $location : 'St. Paul the Apostle Catholic Church',

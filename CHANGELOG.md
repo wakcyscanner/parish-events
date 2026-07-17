@@ -2,6 +2,14 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.0.12 — 2026-07-17
+
+### New
+
+- **Registration / RSVP link.** The parish calendar feed has no field for sign-ups, so each event now has its own slot: paste an Eventbrite, SignUpGenius, form, or any other link, and the event page shows a prominent "Register / RSVP" button ahead of the add-to-calendar buttons (upcoming events only — it disappears once the event has passed). Like the featured image, imports never touch it, override or not.
+- **Optional cost field.** Free-text ("$10", "$25 per family", "Free-will offering") shown as a Cost row in the event details. Search engines get honest pricing too: a dollar amount becomes the structured-data price, "free" wording marks the event free, and events with no cost stay marked free as before. The registration link doubles as the structured-data offer URL.
+- Events with a registration link show a ticket icon in the admin list's Flags column.
+
 ## 1.0.11 — 2026-07-16
 
 ### Fixed

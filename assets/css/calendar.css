@@ -357,6 +357,27 @@ a.pe-event-title:hover {
 	text-decoration: none;
 }
 
+/* Registration is the primary action: solid where the calendar buttons
+   are outlined. */
+.pe-register-btn {
+	display: inline-block;
+	padding: 0.3rem 1.1rem;
+	border: 1px solid #2c5f2d;
+	border-radius: 4px;
+	background: #2c5f2d;
+	color: #fff;
+	text-decoration: none;
+	font-size: 0.9em;
+	font-weight: 600;
+}
+
+.pe-register-btn:hover {
+	background: #234b24;
+	border-color: #234b24;
+	color: #fff;
+	text-decoration: none;
+}
+
 /* --- Upcoming events (widget / shortcode) --- */
 .pe-upcoming {
 	list-style: none;

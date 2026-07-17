@@ -133,10 +133,15 @@ class PE_Content {
 
 		$html .= self::render_header_block( $post_id );
 
-		// Add-to-calendar buttons for upcoming, published events.
+		// Registration and add-to-calendar buttons for upcoming, published
+		// events. Registration leads: it's the action the visitor came for.
 		if ( 'publish' === get_post_status( $post_id ) && ! pe_event_is_past( $post_id ) ) {
 			$google = PE_ICS::google_url( $post_id );
 			$html  .= '<p class="pe-add-to-calendar">';
+			$reg    = get_post_meta( $post_id, '_pe_registration_url', true );
+			if ( '' !== $reg ) {
+				$html .= '<a class="pe-register-btn" target="_blank" rel="noopener noreferrer" href="' . esc_url( $reg ) . '">' . esc_html__( 'Register / RSVP', 'parish-events' ) . '</a> ';
+			}
 			$html  .= '<a class="pe-cal-btn" href="' . esc_url( add_query_arg( 'pe_ics', $post_id, home_url( '/' ) ) ) . '">' . esc_html__( 'Add to calendar (.ics)', 'parish-events' ) . '</a>';
 			if ( $google ) {
 				$html .= ' <a class="pe-cal-btn" target="_blank" rel="noopener noreferrer" href="' . esc_url( $google ) . '">' . esc_html__( 'Google Calendar', 'parish-events' ) . '</a>';
@@ -230,6 +235,7 @@ class PE_Content {
 			__( 'Date', 'parish-events' )     => esc_html( $date_label ),
 			__( 'Time', 'parish-events' )     => esc_html( $time_label ),
 			__( 'Location', 'parish-events' ) => pe_location_html( $location ),
+			__( 'Cost', 'parish-events' )     => esc_html( get_post_meta( $post_id, '_pe_cost', true ) ),
 			__( 'Group', 'parish-events' )    => esc_html( $group ),
 			__( 'Type', 'parish-events' )     => esc_html( $type ),
 		);
