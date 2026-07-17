@@ -28,6 +28,12 @@ class PE_Updater {
 	/**
 	 * Answer WordPress's update check for this plugin.
 	 *
+	 * The latest release is reported even when it isn't newer: core does the
+	 * version comparison and files it under response (update available) or
+	 * no_update (current). The no_update entry matters — without it the
+	 * Plugins screen treats the plugin as unmanaged and hides the
+	 * enable-auto-updates control.
+	 *
 	 * @param array|false $update      Existing update data (false when none).
 	 * @param array       $plugin_data Parsed plugin headers.
 	 * @param string      $plugin_file Plugin basename being checked.
@@ -39,11 +45,12 @@ class PE_Updater {
 		}
 
 		$release = self::latest_release();
-		if ( null === $release || version_compare( $release['version'], PE_VERSION, '<=' ) ) {
+		if ( null === $release ) {
 			return $update;
 		}
 
 		return array(
+			'id'      => 'github.com/' . self::REPO,
 			'slug'    => dirname( plugin_basename( PE_PLUGIN_FILE ) ),
 			'version' => $release['version'],
 			'url'     => $release['url'],

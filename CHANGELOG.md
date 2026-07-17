@@ -2,6 +2,12 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.0.11 — 2026-07-16
+
+### Fixed
+
+- **The "Enable auto-updates" link now appears** on the Plugins screen. WordPress only offers the toggle for plugins whose update state it knows; when the site was already on the latest version, the update check reported nothing, so the row showed no auto-update control. The check now always reports the latest release and lets WordPress decide whether it's an update.
+
 ## 1.0.10 — 2026-07-16
 
 ### New

@@ -85,6 +85,9 @@ delete_site_transient( 'update_plugins' );
 wp_update_plugins();
 $updates = get_site_transient( 'update_plugins' );
 pe_check( 'older release offers no update', ! isset( $updates->response[ $basename ] ) );
+// The no_update entry is what makes the Plugins screen show the
+// enable-auto-updates control for an up-to-date plugin.
+pe_check( 'up-to-date plugin lands in no_update (auto-update toggle)', isset( $updates->no_update[ $basename ] ) );
 remove_filter( 'pre_http_request', $mock_old, 10 );
 
 // --- 4. API failure caches null briefly and offers nothing --------------------
