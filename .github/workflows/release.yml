@@ -31,6 +31,17 @@ jobs:
             exit 1
           fi
 
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          mkdir -p dist
+          awk -v ver="$version" '$1 == "##" && $2 == ver { found = 1; next } $1 == "##" { found = 0 } found' CHANGELOG.md > dist/notes.md
+          if ! grep -q '[^[:space:]]' dist/notes.md; then
+            echo "CHANGELOG.md has no '## ${version}' section — write the release notes before tagging" >&2
+            exit 1
+          fi
+          cat dist/notes.md
+
       - name: Build plugin zip
         run: |
           version="${GITHUB_REF_NAME#v}"
@@ -49,5 +60,9 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
+          name: ${{ github.ref_name }} — Parish Events
           files: dist/parish-events-*.zip
+          body_path: dist/notes.md
+          # Appends the compare link / new-contributor footer after the
+          # hand-written notes.
           generate_release_notes: true
