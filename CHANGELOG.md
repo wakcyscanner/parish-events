@@ -2,6 +2,12 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.0.13 — 2026-07-17
+
+### New
+
+- **Release channels.** A "Receive beta updates" checkbox in Settings opts a site into pre-release versions — meant for staging, so new features can soak there before production sees them. Unchecked (the default), a site only ever receives stable releases; a stable release newer than the newest beta always wins. Site-level override available via the `pe_update_channel` filter.
+
 ## 1.0.12 — 2026-07-17
 
 ### New

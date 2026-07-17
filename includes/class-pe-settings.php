@@ -55,6 +55,7 @@ class PE_Settings {
 			'location_addresses'       => array(),
 			'location_info'            => array(),
 			'alert_emails'             => array(),
+			'update_channel'           => 'stable',
 			'default_image'            => 'https://stpacc.diocesanweb.org/wp-content/uploads/2025/10/PSX_20200823_093726-2.jpg',
 			'cancelled_grace_days'     => 14,
 			'delete_data_on_uninstall' => 0,
@@ -257,6 +258,9 @@ class PE_Settings {
 			}
 			$out['alert_emails'] = array_values( array_unique( $emails ) );
 		}
+
+		// Unchecked checkbox = absent from the POST = stable.
+		$out['update_channel'] = ( isset( $input['update_channel'] ) && 'beta' === $input['update_channel'] ) ? 'beta' : 'stable';
 
 		if ( isset( $input['default_image'] ) ) {
 			$out['default_image'] = esc_url_raw( trim( $input['default_image'] ) );

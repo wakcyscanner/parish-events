@@ -63,6 +63,10 @@ jobs:
           name: ${{ github.ref_name }} — Parish Events
           files: dist/parish-events-*.zip
           body_path: dist/notes.md
+          # Beta tags (v1.1.0-beta.1 — anything with a hyphen) publish as
+          # prereleases: GitHub keeps them out of /releases/latest, so only
+          # sites on the beta update channel are offered them.
+          prerelease: ${{ contains(github.ref_name, '-') }}
           # Appends the compare link / new-contributor footer after the
           # hand-written notes.
           generate_release_notes: true

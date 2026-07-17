@@ -104,7 +104,52 @@ $cached = get_transient( PE_Updater::CACHE_KEY );
 pe_check( 'API failure result cached (no hammering)', is_array( $cached ) && null === $cached['release'] );
 remove_filter( 'pre_http_request', $mock_fail, 10 );
 
-// --- 5. Live API: real latest release parses ----------------------------------
+// --- 5. Release channels ------------------------------------------------------
+$mock_channels = static function ( $pre, $args, $url ) {
+	if ( false !== strpos( $url, '/releases/latest' ) ) {
+		return pe_mock_release( 'v2.0.0' ); // stable channel endpoint
+	}
+	if ( false !== strpos( $url, '/releases?' ) ) {
+		$stable = json_decode( pe_mock_release( 'v2.0.0' )['body'], true );
+		$beta   = json_decode( pe_mock_release( 'v2.1.0-beta.1' )['body'], true );
+		$draft  = json_decode( pe_mock_release( 'v3.0.0' )['body'], true );
+		$draft['draft'] = true;
+		return array(
+			'headers'  => array(),
+			'response' => array(
+				'code'    => 200,
+				'message' => 'OK',
+			),
+			'body'     => wp_json_encode( array( $beta, $stable, $draft ) ),
+		);
+	}
+	return $pre;
+};
+add_filter( 'pre_http_request', $mock_channels, 10, 3 );
+
+$settings = get_option( 'pe_settings', array() );
+
+$settings['update_channel'] = 'stable';
+update_option( 'pe_settings', $settings );
+delete_transient( PE_Updater::CACHE_KEY );
+$rel = PE_Updater::latest_release();
+pe_check( 'stable channel sees stable release only', '2.0.0' === $rel['version'] );
+
+$settings['update_channel'] = 'beta';
+update_option( 'pe_settings', $settings );
+$rel = PE_Updater::latest_release();
+pe_check( 'channel switch busts the cache', '2.1.0-beta.1' === $rel['version'] );
+pe_check( 'beta version outranks stable via version_compare', version_compare( '2.1.0-beta.1', '2.0.0', '>' ) && version_compare( '2.1.0-beta.1', '2.1.0', '<' ) );
+
+// A draft (v3.0.0) must never be offered even on beta.
+pe_check( 'draft releases are never offered', '2.1.0-beta.1' === $rel['version'] );
+
+$settings['update_channel'] = 'stable';
+update_option( 'pe_settings', $settings );
+delete_transient( PE_Updater::CACHE_KEY );
+remove_filter( 'pre_http_request', $mock_channels, 10 );
+
+// --- 6. Live API: real latest release parses ----------------------------------
 delete_transient( PE_Updater::CACHE_KEY );
 $live = PE_Updater::latest_release();
 if ( null === $live ) {

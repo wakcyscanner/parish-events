@@ -92,21 +92,45 @@ class PE_Updater {
 	}
 
 	/**
-	 * Latest GitHub release with an installable zip asset, cached for a few
-	 * hours. Returns null when there is no usable release (or the API is
-	 * unreachable — failures are cached briefly so a GitHub outage can't
-	 * slow every admin page load).
+	 * Which release channel this site follows. Stable is the default and
+	 * only ever sees full releases; the beta channel (settings checkbox,
+	 * meant for staging sites) also considers GitHub prereleases.
+	 *
+	 * @return string 'stable' or 'beta'.
+	 */
+	public static function channel() {
+		$channel = 'beta' === PE_Settings::get( 'update_channel' ) ? 'beta' : 'stable';
+		return apply_filters( 'pe_update_channel', $channel );
+	}
+
+	/**
+	 * Latest GitHub release with an installable zip asset for this site's
+	 * channel, cached for a few hours. Returns null when there is no usable
+	 * release (or the API is unreachable — failures are cached briefly so a
+	 * GitHub outage can't slow every admin page load).
 	 *
 	 * @return array|null {version, package, url, notes, date}
 	 */
 	public static function latest_release() {
+		$channel = self::channel();
+
 		$cached = get_transient( self::CACHE_KEY );
-		if ( is_array( $cached ) && array_key_exists( 'release', $cached ) ) {
+		if (
+			is_array( $cached )
+			&& array_key_exists( 'release', $cached )
+			&& isset( $cached['channel'] )
+			&& $channel === $cached['channel']
+		) {
 			return $cached['release'];
 		}
 
+		// GitHub's /releases/latest endpoint already excludes prereleases
+		// and drafts — exactly the stable channel. Beta scans the release
+		// list and takes the highest version, so a newer stable release
+		// still wins over an older beta.
+		$endpoint = 'beta' === $channel ? 'releases?per_page=20' : 'releases/latest';
 		$response = wp_remote_get(
-			'https://api.github.com/repos/' . self::REPO . '/releases/latest',
+			'https://api.github.com/repos/' . self::REPO . '/' . $endpoint,
 			array(
 				'timeout' => 10,
 				'headers' => array( 'Accept' => 'application/vnd.github+json' ),
@@ -114,12 +138,42 @@ class PE_Updater {
 		);
 
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			set_transient( self::CACHE_KEY, array( 'release' => null ), HOUR_IN_SECONDS );
+			set_transient(
+				self::CACHE_KEY,
+				array(
+					'release' => null,
+					'channel' => $channel,
+				),
+				HOUR_IN_SECONDS
+			);
 			return null;
 		}
 
-		$release = self::parse_release( json_decode( wp_remote_retrieve_body( $response ), true ) );
-		set_transient( self::CACHE_KEY, array( 'release' => $release ), self::CACHE_TTL );
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( 'beta' === $channel ) {
+			$release = null;
+			foreach ( (array) $body as $item ) {
+				if ( ! empty( $item['draft'] ) ) {
+					continue;
+				}
+				$parsed = self::parse_release( $item );
+				if ( null !== $parsed && ( null === $release || version_compare( $parsed['version'], $release['version'], '>' ) ) ) {
+					$release = $parsed;
+				}
+			}
+		} else {
+			$release = self::parse_release( $body );
+		}
+
+		set_transient(
+			self::CACHE_KEY,
+			array(
+				'release' => $release,
+				'channel' => $channel,
+			),
+			self::CACHE_TTL
+		);
 		return $release;
 	}
 

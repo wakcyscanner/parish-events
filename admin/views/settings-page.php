@@ -114,6 +114,16 @@ $pe_run_log  = get_option( 'pe_run_log', array() );
 				</td>
 			</tr>
 			<tr>
+				<th scope="row"><?php esc_html_e( 'Update channel', 'parish-events' ); ?></th>
+				<td>
+					<label>
+						<input type="checkbox" name="<?php echo esc_attr( PE_Settings::OPTION ); ?>[update_channel]" value="beta" <?php checked( 'beta', $pe_settings['update_channel'] ); ?>>
+						<?php esc_html_e( 'Receive beta (pre-release) updates', 'parish-events' ); ?>
+					</label>
+					<p class="description"><?php esc_html_e( 'For staging sites: offers pre-release versions from the beta channel as plugin updates. Leave unchecked on production — it then only ever sees stable releases.', 'parish-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
 				<th scope="row"><label for="pe_cancelled_grace_days"><?php esc_html_e( 'Cancelled-page grace period (days)', 'parish-events' ); ?></label></th>
 				<td>
 					<input type="number" min="0" max="60" class="small-text" id="pe_cancelled_grace_days"

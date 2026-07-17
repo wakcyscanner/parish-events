@@ -57,6 +57,21 @@ Installable zips are published under [Releases](../../releases).
 
 After the initial install, updates arrive like any other plugin: the plugin checks this repo's Releases and offers new versions on the Plugins screen, where they can be installed in one click (or auto-updated, if enabled).
 
+## Release channels
+
+There are two update channels:
+
+- **Stable** (the default) — sees full releases only. Production sites stay here.
+- **Beta** — additionally sees pre-releases. Enable it per site with the "Receive beta updates" checkbox in Parish Events → Settings. Meant for staging sites; a stable release newer than the newest beta always wins.
+
+The development flow behind that:
+
+1. Feature work lands on the **`beta` branch** and ships as a pre-release: version like `1.1.0-beta.1`, tag `v1.1.0-beta.1`. Any tag containing a hyphen publishes as a GitHub *prerelease*, which the stable channel never sees.
+2. Staging (on the beta channel) receives it as a normal plugin update and soaks it.
+3. When it's proven, `beta` merges to **`main`** and ships as a stable release (`1.1.0`, tag `v1.1.0`) — production picks it up.
+
+Both channels use the same release workflow: bump the plugin `Version` header, add a `CHANGELOG.md` section for the version, and push the matching tag.
+
 ## Launch checklist
 
 1. The plugin claims the `/events/` URL base for event posts. If another plugin or page already serves `/events/`, resolve that first: deactivate the conflicting plugin, or keep a page at `/events/` and put the `[parish_events_calendar]` shortcode in it — the page URL and the post type coexist.
