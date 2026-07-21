@@ -2,6 +2,19 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.1.0-beta.1 — 2026-07-21
+
+Beta release — beta-channel sites only.
+
+### New
+
+- **Featured events slider.** `[parish_events_featured]` is now a horizontal slider instead of a static three-card grid, showing up to 24 events (default 12). Cards are redesigned: portrait format with the image filling the card, the group name in a bubble at the top, and the title, date, and location overlaid on a gradient at the bottom. Arrow buttons, dot navigation, and swipe/scroll all work; without JavaScript it degrades to a native scroll strip. The `columns` attribute now means "cards visible at once" (narrow screens automatically show fewer).
+- **Group-specific calendars.** Setting the group in the calendar shortcode — `[parish_events_calendar group="Youth Ministry"]` — now locks the calendar to that group for ministry pages: the group dropdown disappears, the URL filter parameter is ignored, and list/month views and linked occurrences (like Mass) respect the lock.
+
+### Changed
+
+- The featured-card excerpt is gone — the overlay design has no room for it, and the card links straight to the full event page. (`show_excerpt` is still accepted so existing shortcodes don't break.)
+
 ## 1.0.13 — 2026-07-17
 
 ### New

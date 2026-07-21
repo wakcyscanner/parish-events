@@ -198,69 +198,183 @@ a.pe-event-title:hover {
 	background: #fafafa;
 }
 
-/* --- Featured cards --- */
-.pe-featured-cards {
-	display: grid;
-	gap: 1.25rem;
-	grid-template-columns: repeat(1, 1fr);
+/* --- Featured events slider --- */
+.pe-featured-slider {
+	position: relative;
 }
 
-@media (min-width: 600px) {
-	.pe-featured-cards.pe-columns-2,
-	.pe-featured-cards.pe-columns-3,
-	.pe-featured-cards.pe-columns-4 {
-		grid-template-columns: repeat(2, 1fr);
-	}
-}
-
-@media (min-width: 900px) {
-	.pe-featured-cards.pe-columns-3 {
-		grid-template-columns: repeat(3, 1fr);
-	}
-
-	.pe-featured-cards.pe-columns-4 {
-		grid-template-columns: repeat(4, 1fr);
-	}
-}
-
-.pe-card {
-	border: 1px solid #e2e2e2;
-	border-radius: 6px;
-	overflow: hidden;
-	background: #fff;
+.pe-slider-track {
 	display: flex;
-	flex-direction: column;
+	gap: 1rem;
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+	padding: 0.25rem 0 0.5rem;
+	scrollbar-width: none;
 }
 
-.pe-card-image img {
+.pe-slider-track::-webkit-scrollbar {
+	display: none;
+}
+
+/* Portrait cards: the image fills the card, text overlays a bottom
+   gradient. --pe-visible = cards per view (the shortcode's columns). */
+.pe-featured-slider .pe-card {
+	position: relative;
+	flex: 0 0 calc((100% - (var(--pe-visible) - 1) * 1rem) / var(--pe-visible));
+	aspect-ratio: 3 / 4;
+	margin: 0;
+	border-radius: 10px;
+	overflow: hidden;
+	background: #2c5f2d;
+	scroll-snap-align: start;
+}
+
+@media (max-width: 900px) {
+	.pe-featured-slider {
+		--pe-visible: 2 !important;
+	}
+}
+
+@media (max-width: 560px) {
+	.pe-featured-slider {
+		/* A sliver of the next card signals there's more to scroll. */
+		--pe-visible: 1.15 !important;
+	}
+}
+
+.pe-card-link {
+	position: absolute;
+	inset: 0;
 	display: block;
-	width: 100%;
-	height: 180px;
-	object-fit: cover;
-}
-
-.pe-card-body {
-	padding: 0.9rem 1rem 1.1rem;
-}
-
-.pe-card-title {
-	margin: 0 0 0.35rem;
-	font-size: 1.05em;
-}
-
-.pe-card-title a {
+	color: #fff;
 	text-decoration: none;
 }
 
-.pe-card-meta {
-	margin: 0 0 0.5rem;
-	color: #666;
-	font-size: 0.88em;
+.pe-card-img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.25s ease;
 }
 
-.pe-card-excerpt {
+.pe-card-link:hover .pe-card-img {
+	transform: scale(1.04);
+}
+
+.pe-card-link::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 40%, rgba(8, 21, 40, 0.88) 100%);
+}
+
+.pe-card-badge {
+	position: absolute;
+	top: 0.75rem;
+	left: 0.75rem;
+	z-index: 2;
+	max-width: calc(100% - 1.5rem);
+	padding: 0.22rem 0.8rem;
+	border-radius: 999px;
+	background: #fff;
+	color: #2c5f2d;
+	font-size: 0.78em;
+	font-weight: 600;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.pe-card-overlay {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 2;
+	display: block;
+	padding: 1rem;
+}
+
+.pe-card-title {
+	display: block;
+	margin: 0 0 0.35rem;
+	font-size: 1.15em;
+	font-weight: 700;
+	line-height: 1.25;
+	color: #fff;
+}
+
+.pe-card-meta {
+	display: block;
 	margin: 0;
-	font-size: 0.92em;
+	font-size: 0.85em;
+	color: #fff;
+	opacity: 0.92;
+}
+
+.pe-slider-btn {
+	position: absolute;
+	top: 50%;
+	z-index: 3;
+	transform: translateY(-50%);
+	width: 2.4rem;
+	height: 2.4rem;
+	border: 0;
+	border-radius: 50%;
+	background: #fff;
+	color: #2c5f2d;
+	font-size: 1rem;
+	line-height: 1;
+	cursor: pointer;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.pe-slider-prev {
+	left: -0.6rem;
+}
+
+.pe-slider-next {
+	right: -0.6rem;
+}
+
+.pe-slider-btn:disabled {
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* Until (or without) JS the native scroll strip stands alone. */
+.pe-featured-slider:not(.pe-slider-ready) .pe-slider-btn,
+.pe-featured-slider:not(.pe-slider-ready) .pe-slider-dots {
+	display: none;
+}
+
+.pe-slider-dots {
+	display: flex;
+	gap: 0.4rem;
+	justify-content: center;
+	margin-top: 0.5rem;
+}
+
+.pe-slider-dots:empty {
+	display: none;
+}
+
+.pe-dot {
+	width: 0.6rem;
+	height: 0.6rem;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: #c9d3c9;
+	cursor: pointer;
+}
+
+.pe-dot-active {
+	background: #2c5f2d;
 }
 
 /* --- Single event page --- */

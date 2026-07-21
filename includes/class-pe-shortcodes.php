@@ -186,10 +186,18 @@ class PE_Shortcodes {
 			'parish_events_calendar'
 		);
 
-		// GET params override shortcode defaults (plain-link navigation).
-		$view  = isset( $_GET['pe_view'] ) ? sanitize_key( $_GET['pe_view'] ) : $atts['view']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$view  = in_array( $view, array( 'list', 'month' ), true ) ? $view : 'list';
-		$group = isset( $_GET['pe_group'] ) ? sanitize_text_field( wp_unslash( $_GET['pe_group'] ) ) : $atts['group']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// GET params override shortcode defaults (plain-link navigation) —
+		// except a group set in the shortcode, which locks the calendar to
+		// that group (for ministry pages): the group dropdown disappears and
+		// the pe_group GET param is ignored.
+		$locked = '' !== trim( $atts['group'] );
+		$view   = isset( $_GET['pe_view'] ) ? sanitize_key( $_GET['pe_view'] ) : $atts['view']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$view   = in_array( $view, array( 'list', 'month' ), true ) ? $view : 'list';
+		if ( $locked ) {
+			$group = trim( $atts['group'] );
+		} else {
+			$group = isset( $_GET['pe_group'] ) ? sanitize_text_field( wp_unslash( $_GET['pe_group'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		}
 		$month = isset( $_GET['pe_month'] ) ? sanitize_text_field( wp_unslash( $_GET['pe_month'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! preg_match( '/^\d{4}-\d{2}$/', $month ) ) {
 			$month = substr( pe_today(), 0, 7 );
@@ -222,7 +230,7 @@ class PE_Shortcodes {
 		$html = '<div class="pe-calendar">';
 
 		if ( '1' === $atts['show_toggle'] || '1' === $atts['show_filter'] ) {
-			$html .= self::render_controls( $view, $group, $atts );
+			$html .= self::render_controls( $view, $group, $atts, $locked );
 		}
 
 		if ( 'month' === $view ) {
@@ -327,7 +335,7 @@ class PE_Shortcodes {
 		return $permalink ? $permalink : home_url( '/' );
 	}
 
-	private static function render_controls( $view, $group, $atts ) {
+	private static function render_controls( $view, $group, $atts, $locked = false ) {
 		$base = self::base_url();
 		$html = '<div class="pe-controls">';
 
@@ -337,7 +345,9 @@ class PE_Shortcodes {
 				'list'  => __( 'List', 'parish-events' ),
 				'month' => __( 'Month', 'parish-events' ),
 			) as $key => $label ) {
-				$url   = add_query_arg( array_filter( array( 'pe_view' => $key, 'pe_group' => $group ) ), $base );
+				// A locked group comes from the shortcode itself; the links
+				// don't need to carry it.
+				$url   = add_query_arg( array_filter( array( 'pe_view' => $key, 'pe_group' => $locked ? '' : $group ) ), $base );
 				$class = $key === $view ? 'pe-toggle-active' : '';
 				$html .= sprintf( '<a class="%s" href="%s">%s</a>', esc_attr( $class ), esc_url( $url ), esc_html( $label ) );
 			}
@@ -346,7 +356,7 @@ class PE_Shortcodes {
 
 		$html .= '<a class="pe-subscribe" href="' . esc_url( PE_ICS::subscribe_url() ) . '" title="' . esc_attr__( 'Opens in your calendar app and stays up to date automatically', 'parish-events' ) . '">&#128197; ' . esc_html__( 'Subscribe', 'parish-events' ) . '</a>';
 
-		if ( '1' === $atts['show_filter'] ) {
+		if ( '1' === $atts['show_filter'] && ! $locked ) {
 			$groups = self::group_names();
 			if ( $groups ) {
 				$html .= '<form class="pe-group-filter" method="get" action="">';
@@ -511,15 +521,23 @@ class PE_Shortcodes {
 	}
 
 	/**
-	 * [parish_events_featured count="3" order="date|title|rand" columns="3" show_excerpt="1"]
+	 * [parish_events_featured count="12" order="date|title|rand" columns="3"]
+	 *
+	 * A horizontal slider of featured upcoming events: portrait cards where
+	 * the image fills the card, a group badge sits top-left, and the title
+	 * and date/location overlay a bottom gradient. `columns` is how many
+	 * cards are visible at once on desktop (narrow screens show fewer).
+	 * Works without JS as a native scroll strip; the script adds arrows,
+	 * dots, and button state. (`show_excerpt` is accepted for back-compat
+	 * but the overlay design has no excerpt.)
 	 */
 	public static function featured( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'count'        => '3',
+				'count'        => '12',
 				'order'        => 'date',
 				'columns'      => '3',
-				'show_excerpt' => '1',
+				'show_excerpt' => '0',
 			),
 			$atts,
 			'parish_events_featured'
@@ -531,13 +549,14 @@ class PE_Shortcodes {
 		$cached    = get_transient( $cache_key );
 		if ( false !== $cached ) {
 			self::enqueue();
+			self::enqueue_slider();
 			return $cached;
 		}
 
 		$args = array(
 			'post_type'              => PE_CPT::POST_TYPE,
 			'post_status'            => 'publish',
-			'posts_per_page'         => min( 12, max( 1, (int) $atts['count'] ) ),
+			'posts_per_page'         => min( 24, max( 1, (int) $atts['count'] ) ),
 			'no_found_rows'          => true,
 			'update_post_term_cache' => false,
 			'meta_query'             => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
@@ -572,13 +591,15 @@ class PE_Shortcodes {
 			return '';
 		}
 
-		$columns = min( 4, max( 1, (int) $atts['columns'] ) );
+		$columns = min( 5, max( 1, (int) $atts['columns'] ) );
 		$default = PE_Settings::get( 'default_image' );
 
-		$html = '<div class="pe-featured-cards pe-columns-' . esc_attr( $columns ) . '">';
+		$html  = '<div class="pe-featured-slider" style="--pe-visible:' . esc_attr( $columns ) . '">';
+		$html .= '<button type="button" class="pe-slider-btn pe-slider-prev" aria-label="' . esc_attr__( 'Previous events', 'parish-events' ) . '">&#10094;</button>';
+		$html .= '<div class="pe-slider-track" tabindex="0" aria-label="' . esc_attr__( 'Featured events', 'parish-events' ) . '">';
 		foreach ( $query->posts as $post ) {
 			$permalink = get_permalink( $post );
-			$image     = get_the_post_thumbnail_url( $post, 'medium_large' );
+			$image     = get_the_post_thumbnail_url( $post, 'large' );
 			if ( ! $image ) {
 				$image = $default;
 			}
@@ -589,23 +610,27 @@ class PE_Shortcodes {
 				$when .= ' · ' . pe_format_time( get_post_meta( $post->ID, '_pe_start_time', true ) );
 			}
 			$location = get_post_meta( $post->ID, '_pe_location', true );
+			$group    = get_post_meta( $post->ID, '_pe_group_name', true );
 
 			$html .= '<article class="pe-card">';
+			$html .= '<a class="pe-card-link" href="' . esc_url( $permalink ) . '">';
 			if ( $image ) {
-				$html .= '<a class="pe-card-image" href="' . esc_url( $permalink ) . '"><img src="' . esc_url( $image ) . '" alt="" loading="lazy"></a>';
+				$html .= '<img class="pe-card-img" src="' . esc_url( $image ) . '" alt="" loading="lazy">';
 			}
-			$html .= '<div class="pe-card-body">';
-			$html .= '<h3 class="pe-card-title"><a href="' . esc_url( $permalink ) . '">' . esc_html( get_the_title( $post ) ) . '</a></h3>';
-			$html .= '<p class="pe-card-meta">' . esc_html( $when );
+			if ( $group ) {
+				$html .= '<span class="pe-card-badge">' . esc_html( $group ) . '</span>';
+			}
+			$html .= '<span class="pe-card-overlay">';
+			$html .= '<span class="pe-card-title">' . esc_html( get_the_title( $post ) ) . '</span>';
+			$html .= '<span class="pe-card-meta">' . esc_html( $when ) . '</span>';
 			if ( $location ) {
-				$html .= ' · ' . esc_html( $location );
+				$html .= '<span class="pe-card-meta">' . esc_html( $location ) . '</span>';
 			}
-			$html .= '</p>';
-			if ( '1' === $atts['show_excerpt'] && '' !== trim( $post->post_content ) ) {
-				$html .= '<p class="pe-card-excerpt">' . esc_html( wp_trim_words( wp_strip_all_tags( $post->post_content ), 24 ) ) . '</p>';
-			}
-			$html .= '</div></article>';
+			$html .= '</span></a></article>';
 		}
+		$html .= '</div>';
+		$html .= '<button type="button" class="pe-slider-btn pe-slider-next" aria-label="' . esc_attr__( 'More events', 'parish-events' ) . '">&#10095;</button>';
+		$html .= '<div class="pe-slider-dots"></div>';
 		$html .= '</div>';
 
 		// Random ordering must not be frozen by the cache.
@@ -613,6 +638,11 @@ class PE_Shortcodes {
 			set_transient( $cache_key, $html, self::CACHE_TTL );
 		}
 		self::enqueue();
+		self::enqueue_slider();
 		return $html;
+	}
+
+	private static function enqueue_slider() {
+		wp_enqueue_script( 'parish-events-slider', PE_PLUGIN_URL . 'assets/js/featured-slider.js', array(), PE_VERSION, true );
 	}
 }
