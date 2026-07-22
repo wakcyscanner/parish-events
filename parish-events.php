@@ -3,7 +3,7 @@
  * Plugin Name:       Parish Events
  * Plugin URI:        https://github.com/wakcyscanner/stpacc-calendar
  * Description:       Imports parish calendar events from the CCB feed into a custom post type with scheduled sync, manual overrides, structured data, and display shortcodes.
- * Version:           1.2.0-beta.2
+ * Version:           1.2.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            St. Paul the Apostle Catholic Church
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PE_VERSION', '1.2.0-beta.2' );
+define( 'PE_VERSION', '1.2.0' );
 define( 'PE_PLUGIN_FILE', __FILE__ );
 define( 'PE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
