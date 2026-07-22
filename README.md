@@ -10,7 +10,7 @@ Installable zips are published under [Releases](../../releases).
 
 ### Import & sync
 
-- Scheduled import (hourly to daily, or on demand) of the current month plus the next two from a configurable XML feed endpoint.
+- Scheduled import (hourly to daily, or on demand) of the current month plus the next two, directly from the Pushpay ChMS v1 API (`public_calendar_listing`, HTTP Basic Auth) — or from any custom proxy endpoint returning the same XML. Credentials live in Settings or, preferably on production, in `PE_CHMS_SUBDOMAIN` / `PE_CHMS_USERNAME` / `PE_CHMS_PASSWORD` wp-config constants that keep the secret out of the database.
 - One `parish_event` post per occurrence, keyed by CCB event ID + date — upstream edits update the same post and its URL never changes.
 - Safe by design: a failed, empty, or malformed fetch never removes anything; unchanged feeds produce zero writes; past events are never touched.
 - Import failure alerts by email (after three consecutive failed runs, with a recovery notice), plus a run log in the settings screen.
@@ -53,7 +53,7 @@ Installable zips are published under [Releases](../../releases).
 1. Download the latest `parish-events-x.y.z.zip` from [Releases](../../releases).
 2. In wp-admin, go to Plugins → Add New Plugin → Upload Plugin, and upload the zip (uploading a newer zip over an existing install upgrades it in place).
 3. Activate. The plugin flushes rewrite rules on activation; if event URLs 404, re-save Settings → Permalinks once.
-4. Configure Parish Events → Settings: feed URL, schedule, suppression rules, location directory, and alert emails.
+4. Configure Parish Events → Settings: ChMS subdomain + API credentials (or a legacy custom feed URL), schedule, suppression rules, location directory, and alert emails.
 
 After the initial install, updates arrive like any other plugin: the plugin checks this repo's Releases and offers new versions on the Plugins screen, where they can be installed in one click (or auto-updated, if enabled).
 

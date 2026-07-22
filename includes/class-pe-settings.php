@@ -16,6 +16,9 @@ class PE_Settings {
 
 	public static function defaults() {
 		return array(
+			'chms_subdomain'           => '',
+			'chms_username'            => '',
+			'chms_password'            => '',
 			'api_base_url'             => 'https://falling-cherry-6eaa.stpacc-account.workers.dev/',
 			'schedule'                 => 'twicedaily',
 			'suppress_ids'             => array(),
@@ -266,6 +269,24 @@ class PE_Settings {
 		if ( isset( $input['accent_color'] ) ) {
 			$hex                 = sanitize_hex_color( trim( (string) $input['accent_color'] ) );
 			$out['accent_color'] = $hex ? $hex : '';
+		}
+
+		if ( isset( $input['chms_subdomain'] ) ) {
+			// Accept a bare subdomain or a pasted URL/domain.
+			$sub = strtolower( trim( (string) $input['chms_subdomain'] ) );
+			$sub = preg_replace( '#^https?://#', '', $sub );
+			$sub = preg_replace( '#\.ccbchurch\.com.*$#', '', $sub );
+			$out['chms_subdomain'] = preg_replace( '/[^a-z0-9-]/', '', $sub );
+		}
+
+		if ( isset( $input['chms_username'] ) ) {
+			$out['chms_username'] = sanitize_text_field( (string) $input['chms_username'] );
+		}
+
+		if ( isset( $input['chms_password'] ) ) {
+			// Trim only — passwords may legitimately contain characters that
+			// sanitize_text_field would eat.
+			$out['chms_password'] = trim( (string) $input['chms_password'] );
 		}
 
 		if ( isset( $input['default_image'] ) ) {

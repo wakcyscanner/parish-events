@@ -10,20 +10,70 @@ if ( ! defined( 'ABSPATH' ) ) {
 class PE_Feed_Client {
 
 	/**
-	 * Fetch the raw feed body for a date window.
+	 * The ChMS v1 API credentials. wp-config constants beat settings, so
+	 * secrets can stay out of the database on production:
+	 *   define( 'PE_CHMS_SUBDOMAIN', 'yourchurch' );
+	 *   define( 'PE_CHMS_USERNAME', '...' );
+	 *   define( 'PE_CHMS_PASSWORD', '...' );
+	 *
+	 * @return array{subdomain:string,username:string,password:string}
+	 */
+	public static function credentials() {
+		return array(
+			'subdomain' => defined( 'PE_CHMS_SUBDOMAIN' ) ? PE_CHMS_SUBDOMAIN : (string) PE_Settings::get( 'chms_subdomain' ),
+			'username'  => defined( 'PE_CHMS_USERNAME' ) ? PE_CHMS_USERNAME : (string) PE_Settings::get( 'chms_username' ),
+			'password'  => defined( 'PE_CHMS_PASSWORD' ) ? PE_CHMS_PASSWORD : (string) PE_Settings::get( 'chms_password' ),
+		);
+	}
+
+	/**
+	 * Whether direct ChMS API access is configured (vs. the legacy custom
+	 * feed URL / proxy).
+	 *
+	 * @return bool
+	 */
+	public static function uses_direct_api() {
+		$creds = self::credentials();
+		return '' !== $creds['subdomain'] && '' !== $creds['username'] && '' !== $creds['password'];
+	}
+
+	/**
+	 * Fetch the raw feed body for a date window — directly from the ChMS v1
+	 * API (Basic Auth) when credentials are configured, else from the custom
+	 * feed URL.
 	 *
 	 * @param string $start Y-m-d.
 	 * @param string $end   Y-m-d.
 	 * @return string|WP_Error Raw XML body.
 	 */
 	public static function fetch( $start, $end ) {
-		$url = add_query_arg(
-			array(
-				'date_start' => $start,
-				'date_end'   => $end,
-			),
-			PE_Settings::get( 'api_base_url' )
+		$args = array(
+			'timeout'             => 30,
+			'redirection'         => 0,
+			'limit_response_size' => 5 * MB_IN_BYTES,
 		);
+
+		if ( self::uses_direct_api() ) {
+			$creds = self::credentials();
+			$url   = add_query_arg(
+				array(
+					'srv'        => 'public_calendar_listing',
+					'date_start' => $start,
+					'date_end'   => $end,
+				),
+				'https://' . $creds['subdomain'] . '.ccbchurch.com/api.php'
+			);
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- HTTP Basic Auth.
+			$args['headers'] = array( 'Authorization' => 'Basic ' . base64_encode( $creds['username'] . ':' . $creds['password'] ) );
+		} else {
+			$url = add_query_arg(
+				array(
+					'date_start' => $start,
+					'date_end'   => $end,
+				),
+				PE_Settings::get( 'api_base_url' )
+			);
+		}
 
 		// Test/fixture hook: return a string to bypass the HTTP request.
 		$body = apply_filters( 'pe_pre_fetch_feed', null, $url );
@@ -35,14 +85,7 @@ class PE_Feed_Client {
 		// point the request somewhere the https-only rule never validated)
 		// and a hard response-size cap so a misbehaving origin can't exhaust
 		// memory during import.
-		$response = wp_remote_get(
-			$url,
-			array(
-				'timeout'             => 30,
-				'redirection'         => 0,
-				'limit_response_size' => 5 * MB_IN_BYTES,
-			)
-		);
+		$response = wp_remote_get( $url, $args );
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
@@ -75,8 +118,17 @@ class PE_Feed_Client {
 			return new WP_Error( 'pe_malformed_xml', 'Feed body is not valid XML' );
 		}
 
+		// The ChMS API reports failures (bad credentials, unknown service,
+		// rate limiting) as HTTP 200 with an <errors> block and no items.
+		// Surface the message instead of treating it as an empty feed.
+		$items  = $xml->xpath( '//item' );
+		$errors = $xml->xpath( '//error' );
+		if ( ! $items && $errors ) {
+			return new WP_Error( 'pe_api_error', 'ChMS API error: ' . trim( (string) $errors[0] ) );
+		}
+
 		$rows = array();
-		foreach ( $xml->xpath( '//item' ) as $item ) {
+		foreach ( $items as $item ) {
 			$rows[] = array(
 				'ccb_event_id'  => isset( $item->event_name['ccb_id'] ) ? trim( (string) $item->event_name['ccb_id'] ) : '',
 				'name'          => trim( (string) $item->event_name ),

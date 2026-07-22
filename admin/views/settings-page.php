@@ -17,12 +17,50 @@ $pe_run_log  = get_option( 'pe_run_log', array() );
 		<?php settings_fields( 'pe_settings_group' ); ?>
 		<table class="form-table" role="presentation">
 			<tr>
-				<th scope="row"><label for="pe_api_base_url"><?php esc_html_e( 'API base URL', 'parish-events' ); ?></label></th>
+				<th scope="row"><label for="pe_chms_subdomain"><?php esc_html_e( 'ChMS church subdomain', 'parish-events' ); ?></label></th>
+				<td>
+					<?php if ( defined( 'PE_CHMS_SUBDOMAIN' ) ) : ?>
+						<p><code><?php echo esc_html( PE_CHMS_SUBDOMAIN ); ?></code> — <?php esc_html_e( 'defined in wp-config.php', 'parish-events' ); ?></p>
+					<?php else : ?>
+						<input type="text" class="regular-text" id="pe_chms_subdomain" placeholder="yourchurch"
+							name="<?php echo esc_attr( PE_Settings::OPTION ); ?>[chms_subdomain]"
+							value="<?php echo esc_attr( $pe_settings['chms_subdomain'] ); ?>">
+					<?php endif; ?>
+					<p class="description"><?php esc_html_e( 'The "yourchurch" part of yourchurch.ccbchurch.com. With the API credentials below, imports call the ChMS v1 API directly.', 'parish-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="pe_chms_username"><?php esc_html_e( 'ChMS API username', 'parish-events' ); ?></label></th>
+				<td>
+					<?php if ( defined( 'PE_CHMS_USERNAME' ) ) : ?>
+						<p><em><?php esc_html_e( 'Defined in wp-config.php', 'parish-events' ); ?></em></p>
+					<?php else : ?>
+						<input type="text" class="regular-text" id="pe_chms_username" autocomplete="off"
+							name="<?php echo esc_attr( PE_Settings::OPTION ); ?>[chms_username]"
+							value="<?php echo esc_attr( $pe_settings['chms_username'] ); ?>">
+					<?php endif; ?>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="pe_chms_password"><?php esc_html_e( 'ChMS API password', 'parish-events' ); ?></label></th>
+				<td>
+					<?php if ( defined( 'PE_CHMS_PASSWORD' ) ) : ?>
+						<p><em><?php esc_html_e( 'Defined in wp-config.php', 'parish-events' ); ?></em></p>
+					<?php else : ?>
+						<input type="password" class="regular-text" id="pe_chms_password" autocomplete="new-password"
+							name="<?php echo esc_attr( PE_Settings::OPTION ); ?>[chms_password]"
+							value="<?php echo esc_attr( $pe_settings['chms_password'] ); ?>">
+					<?php endif; ?>
+					<p class="description"><?php esc_html_e( 'API credentials from Pushpay ChMS. For production, PE_CHMS_SUBDOMAIN / PE_CHMS_USERNAME / PE_CHMS_PASSWORD constants in wp-config.php override these fields and keep the secret out of the database.', 'parish-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="pe_api_base_url"><?php esc_html_e( 'Custom feed URL (legacy)', 'parish-events' ); ?></label></th>
 				<td>
 					<input type="url" class="regular-text" id="pe_api_base_url"
 						name="<?php echo esc_attr( PE_Settings::OPTION ); ?>[api_base_url]"
-						value="<?php echo esc_attr( $pe_settings['api_base_url'] ); ?>" required>
-					<p class="description"><?php esc_html_e( 'The Cloudflare worker (or other) endpoint returning the CCB XML feed. Must be https.', 'parish-events' ); ?></p>
+						value="<?php echo esc_attr( $pe_settings['api_base_url'] ); ?>">
+					<p class="description"><?php esc_html_e( 'A proxy endpoint returning the CCB XML feed (must be https). Only used when the ChMS API fields above are not all filled in.', 'parish-events' ); ?></p>
 				</td>
 			</tr>
 			<tr>

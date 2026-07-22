@@ -2,6 +2,15 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.2.0-beta.1 — 2026-07-22
+
+Beta release — beta-channel sites only.
+
+### New
+
+- **Direct ChMS API access.** Imports can now call the Pushpay ChMS v1 API (`public_calendar_listing`) directly with HTTP Basic Auth — no Cloudflare worker or other proxy needed. Enter the church subdomain and API credentials in Settings, or define `PE_CHMS_SUBDOMAIN` / `PE_CHMS_USERNAME` / `PE_CHMS_PASSWORD` in wp-config.php to keep the secret out of the database (constants win over settings). The custom feed URL remains as a fallback whenever the API fields aren't all filled in, so existing installs keep importing unchanged until credentials are entered.
+- ChMS API errors (bad credentials, unknown service) are reported by the API as a successful response with an error block; the importer now surfaces the actual error message in the run log and failure alerts instead of logging an empty feed.
+
 ## 1.1.0 — 2026-07-21
 
 ### New
