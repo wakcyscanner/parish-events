@@ -66,12 +66,16 @@ class PE_Feed_Client {
 			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- HTTP Basic Auth.
 			$args['headers'] = array( 'Authorization' => 'Basic ' . base64_encode( $creds['username'] . ':' . $creds['password'] ) );
 		} else {
+			$base = (string) PE_Settings::get( 'api_base_url' );
+			if ( '' === $base ) {
+				return new WP_Error( 'pe_no_source', 'No feed source configured: enter ChMS API credentials or a custom feed URL in Parish Events settings.' );
+			}
 			$url = add_query_arg(
 				array(
 					'date_start' => $start,
 					'date_end'   => $end,
 				),
-				PE_Settings::get( 'api_base_url' )
+				$base
 			);
 		}
 

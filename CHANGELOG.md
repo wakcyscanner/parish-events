@@ -2,6 +2,14 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.2.0-beta.2 — 2026-07-22
+
+Beta release — beta-channel sites only.
+
+### Fixed
+
+- The custom feed URL (legacy proxy) can now be cleared once direct ChMS API access is configured — saving an empty field previously failed with "API URL must use https". If neither the API credentials nor a custom URL are configured, imports fail with a clear "no feed source configured" message in the run log instead of a malformed request.
+
 ## 1.2.0-beta.1 — 2026-07-22
 
 Beta release — beta-channel sites only.

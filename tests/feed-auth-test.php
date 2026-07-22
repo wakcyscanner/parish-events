@@ -108,6 +108,24 @@ pe_check( 'legacy mode sends no auth header', '' === $captured[0]['auth'] );
 $sanitized = PE_Settings::sanitize( array( 'chms_subdomain' => 'https://MyChurch.ccbchurch.com/api.php' ) );
 pe_check( 'pasted URL reduces to bare subdomain', 'mychurch' === $sanitized['chms_subdomain'] );
 
+// --- 7. The legacy URL can be cleared once direct API is in use ---------------
+$sanitized = PE_Settings::sanitize( array( 'api_base_url' => '' ) );
+pe_check( 'clearing the legacy feed URL saves', '' === $sanitized['api_base_url'] );
+$sanitized = PE_Settings::sanitize( array( 'api_base_url' => 'http://insecure.example.org/' ) );
+pe_check( 'non-https legacy URL still rejected', '' !== $sanitized['api_base_url'] );
+
+// No credentials AND no legacy URL -> a loud, specific error (not a mangled request).
+$settings                   = get_option( 'pe_settings', array() );
+$settings['chms_subdomain'] = '';
+$settings['chms_username']  = '';
+$settings['chms_password']  = '';
+$settings['api_base_url']   = '';
+update_option( 'pe_settings', $settings );
+$none = PE_Feed_Client::fetch( '2026-08-01', '2026-08-31' );
+// (The PE_CHMS_SUBDOMAIN constant from check 4 is still defined, but without
+// username/password direct mode stays off.)
+pe_check( 'no source configured returns pe_no_source', is_wp_error( $none ) && 'pe_no_source' === $none->get_error_code() );
+
 // Restore.
 update_option( 'pe_settings', $backup );
 exit( $fail > 0 ? 1 : 0 );

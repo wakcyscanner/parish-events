@@ -115,10 +115,12 @@ class PE_Settings {
 
 		if ( isset( $input['api_base_url'] ) ) {
 			$url = esc_url_raw( trim( $input['api_base_url'] ) );
-			if ( 0 === strpos( $url, 'https://' ) ) {
+			// The field is optional now that direct ChMS API access exists —
+			// empty clears it; https is only enforced on a real value.
+			if ( '' === $url || 0 === strpos( $url, 'https://' ) ) {
 				$out['api_base_url'] = $url;
 			} else {
-				add_settings_error( self::OPTION, 'pe_api_url', __( 'API URL must use https.', 'parish-events' ) );
+				add_settings_error( self::OPTION, 'pe_api_url', __( 'The custom feed URL must use https.', 'parish-events' ) );
 			}
 		}
 
