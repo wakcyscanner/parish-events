@@ -2,6 +2,18 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.1.0 — 2026-07-21
+
+### New
+
+- **Featured events slider.** `[parish_events_featured]` is now a horizontal slider instead of a static three-card grid, showing up to 24 events (default 12). Cards are redesigned: portrait format with the image filling the card, the group name in a bubble at the top, and the title, date, and location overlaid on a gradient at the bottom. Arrow buttons, dot navigation, and swipe/scroll all work; without JavaScript it degrades to a native scroll strip. The `columns` attribute now means "cards visible at once" (narrow screens automatically show fewer), and card height is capped so wide cards settle toward square on large monitors.
+- **Group-specific calendars.** Setting the group in the calendar shortcode — `[parish_events_calendar group="Youth Ministry"]` — locks the calendar to that group for ministry pages: the group dropdown disappears, the URL filter parameter is ignored, and list/month views and linked occurrences (like Mass) respect the lock.
+- **The plugin now matches the site's colors.** Buttons, badges, calendar accents, month-grid headers, and slider controls draw from one accent color that automatically matches the theme's link color. An "Accent color" field in Settings overrides the automatic choice with a specific hex value; tints and hover shades derive from whichever color wins.
+
+### Changed
+
+- The featured-card excerpt is gone — the overlay design has no room for it, and the card links straight to the full event page. (`show_excerpt` is still accepted so existing shortcodes don't break.)
+
 ## 1.1.0-beta.2 — 2026-07-21
 
 Beta release — beta-channel sites only.
