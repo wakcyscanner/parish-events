@@ -2,6 +2,18 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.1.0-beta.2 — 2026-07-21
+
+Beta release — beta-channel sites only.
+
+### New
+
+- **The plugin now matches the site's colors.** Buttons, badges, calendar accents, month-grid headers, and slider controls draw from one accent color that automatically matches the theme's link color — no more off-brand green on a Diocesan-themed site. An "Accent color" field in Settings overrides the automatic choice with a specific hex value; tints and hover shades derive from whichever color wins.
+
+### Fixed
+
+- Featured slider cards no longer tower on large monitors: card height is capped, so wide cards settle toward a square shape instead of scaling the 3:4 ratio up indefinitely.
+
 ## 1.1.0-beta.1 — 2026-07-21
 
 Beta release — beta-channel sites only.

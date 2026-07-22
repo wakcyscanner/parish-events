@@ -1,5 +1,14 @@
 /* Parish Events frontend styles: calendar/list, featured cards, single pages. */
 
+/* Brand color. Resolution order: the Settings accent color (inline style
+   after this sheet), else a tiny script samples the theme's link color at
+   runtime, else this fallback. Tints and shades derive from the accent via
+   color-mix; each has a static fallback for older browsers. */
+:root {
+	--pe-accent: #2c5f2d;
+	--pe-accent-contrast: #fff;
+}
+
 /* --- Controls --- */
 .pe-controls {
 	display: flex;
@@ -28,9 +37,9 @@
 }
 
 .pe-view-toggle a.pe-toggle-active {
-	background: #2c5f2d;
-	border-color: #2c5f2d;
-	color: #fff;
+	background: var(--pe-accent);
+	border-color: var(--pe-accent);
+	color: var(--pe-accent-contrast);
 }
 
 .pe-group-filter select {
@@ -41,7 +50,7 @@
 .pe-date-heading {
 	margin: 1.5rem 0 0.5rem;
 	padding-bottom: 0.25rem;
-	border-bottom: 2px solid #2c5f2d;
+	border-bottom: 2px solid var(--pe-accent);
 }
 
 .pe-day-list {
@@ -122,8 +131,8 @@ a.pe-event-title:hover {
 
 .pe-month-grid th {
 	padding: 0.4rem 0.2rem;
-	background: #2c5f2d;
-	color: #fff;
+	background: var(--pe-accent);
+	color: var(--pe-accent-contrast);
 	font-size: 0.85em;
 	text-align: center;
 }
@@ -145,10 +154,11 @@ a.pe-event-title:hover {
 
 .pe-today {
 	background: #f3f9f3;
+	background: color-mix(in srgb, var(--pe-accent) 7%, #fff);
 }
 
 .pe-today .pe-day-number {
-	color: #2c5f2d;
+	color: var(--pe-accent);
 }
 
 .pe-past .pe-day-number {
@@ -184,13 +194,16 @@ a.pe-event-title:hover {
 	overflow-wrap: break-word;
 	text-decoration: none;
 	background: #e9f1e9;
+	background: color-mix(in srgb, var(--pe-accent) 13%, #fff);
 	color: #1e4620;
+	color: color-mix(in srgb, var(--pe-accent) 75%, #000);
 	border-radius: 3px;
 	padding: 0.1rem 0.3rem;
 }
 
 .pe-cell-events a:hover {
 	background: #d7e6d7;
+	background: color-mix(in srgb, var(--pe-accent) 24%, #fff);
 	text-decoration: none;
 }
 
@@ -223,10 +236,13 @@ a.pe-event-title:hover {
 	position: relative;
 	flex: 0 0 calc((100% - (var(--pe-visible) - 1) * 1rem) / var(--pe-visible));
 	aspect-ratio: 3 / 4;
+	/* On large monitors the 3:4 ratio would tower; the cap lets wide cards
+	   settle toward square instead. */
+	max-height: 480px;
 	margin: 0;
 	border-radius: 10px;
 	overflow: hidden;
-	background: #2c5f2d;
+	background: var(--pe-accent);
 	scroll-snap-align: start;
 }
 
@@ -280,7 +296,7 @@ a.pe-event-title:hover {
 	padding: 0.22rem 0.8rem;
 	border-radius: 999px;
 	background: #fff;
-	color: #2c5f2d;
+	color: var(--pe-accent);
 	font-size: 0.78em;
 	font-weight: 600;
 	white-space: nowrap;
@@ -326,7 +342,7 @@ a.pe-event-title:hover {
 	border: 0;
 	border-radius: 50%;
 	background: #fff;
-	color: #2c5f2d;
+	color: var(--pe-accent);
 	font-size: 1rem;
 	line-height: 1;
 	cursor: pointer;
@@ -370,11 +386,12 @@ a.pe-event-title:hover {
 	border: 0;
 	border-radius: 50%;
 	background: #c9d3c9;
+	background: color-mix(in srgb, var(--pe-accent) 25%, #fff);
 	cursor: pointer;
 }
 
 .pe-dot-active {
-	background: #2c5f2d;
+	background: var(--pe-accent);
 }
 
 /* --- Single event page --- */
@@ -456,9 +473,9 @@ a.pe-event-title:hover {
 .pe-subscribe {
 	display: inline-block;
 	padding: 0.3rem 0.85rem;
-	border: 1px solid #2c5f2d;
+	border: 1px solid var(--pe-accent);
 	border-radius: 4px;
-	color: #2c5f2d;
+	color: var(--pe-accent);
 	text-decoration: none;
 	font-size: 0.9em;
 	font-weight: 600;
@@ -466,8 +483,8 @@ a.pe-event-title:hover {
 
 .pe-cal-btn:hover,
 .pe-subscribe:hover {
-	background: #2c5f2d;
-	color: #fff;
+	background: var(--pe-accent);
+	color: var(--pe-accent-contrast);
 	text-decoration: none;
 }
 
@@ -476,10 +493,10 @@ a.pe-event-title:hover {
 .pe-register-btn {
 	display: inline-block;
 	padding: 0.3rem 1.1rem;
-	border: 1px solid #2c5f2d;
+	border: 1px solid var(--pe-accent);
 	border-radius: 4px;
-	background: #2c5f2d;
-	color: #fff;
+	background: var(--pe-accent);
+	color: var(--pe-accent-contrast);
 	text-decoration: none;
 	font-size: 0.9em;
 	font-weight: 600;
@@ -487,8 +504,10 @@ a.pe-event-title:hover {
 
 .pe-register-btn:hover {
 	background: #234b24;
+	background: color-mix(in srgb, var(--pe-accent) 80%, #000);
 	border-color: #234b24;
-	color: #fff;
+	border-color: color-mix(in srgb, var(--pe-accent) 80%, #000);
+	color: var(--pe-accent-contrast);
 	text-decoration: none;
 }
 
@@ -551,7 +570,8 @@ a.pe-event-title:hover {
 	padding: 0.6rem 0.8rem;
 	max-width: 34em;
 	background: #f3f7f3;
-	border-left: 3px solid #2c5f2d;
+	background: color-mix(in srgb, var(--pe-accent) 6%, #fff);
+	border-left: 3px solid var(--pe-accent);
 	border-radius: 0 4px 4px 0;
 	font-size: 0.95em;
 }

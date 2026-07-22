@@ -114,6 +114,15 @@ $pe_run_log  = get_option( 'pe_run_log', array() );
 				</td>
 			</tr>
 			<tr>
+				<th scope="row"><label for="pe_accent_color"><?php esc_html_e( 'Accent color', 'parish-events' ); ?></label></th>
+				<td>
+					<input type="text" class="regular-text" id="pe_accent_color" placeholder="#2c5f2d"
+						name="<?php echo esc_attr( PE_Settings::OPTION ); ?>[accent_color]"
+						value="<?php echo esc_attr( $pe_settings['accent_color'] ); ?>">
+					<p class="description"><?php esc_html_e( 'Hex color for buttons, badges, and calendar accents. Leave blank to automatically match your theme\'s link color.', 'parish-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
 				<th scope="row"><?php esc_html_e( 'Update channel', 'parish-events' ); ?></th>
 				<td>
 					<label>

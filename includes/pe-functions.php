@@ -270,6 +270,34 @@ function pe_event_is_past( $post_id ) {
 }
 
 /**
+ * Wire up the accent color for the 'parish-events' stylesheet, once per
+ * request. An accent set in Settings wins; otherwise a tiny inline script
+ * samples the theme's link color at runtime so the plugin matches the site
+ * without configuration. The stylesheet's own --pe-accent is the last
+ * fallback for both paths.
+ */
+function pe_enqueue_accent() {
+	static $done = false;
+	if ( $done ) {
+		return;
+	}
+	$done = true;
+
+	$accent = trim( (string) PE_Settings::get( 'accent_color' ) );
+	if ( '' !== $accent ) {
+		wp_add_inline_style( 'parish-events', ':root{--pe-accent:' . sanitize_hex_color( $accent ) . ';}' );
+		return;
+	}
+
+	wp_register_script( 'parish-events-accent', false, array(), PE_VERSION, true );
+	wp_enqueue_script( 'parish-events-accent' );
+	wp_add_inline_script(
+		'parish-events-accent',
+		'(function(){try{var d=document,p=d.createElement("a");p.href="#";p.style.cssText="position:absolute;left:-9999px";d.body.appendChild(p);var c=getComputedStyle(p).color,b=getComputedStyle(d.body).color;d.body.removeChild(p);if(c&&c!==b){d.documentElement.style.setProperty("--pe-accent",c);}}catch(e){}})();'
+	);
+}
+
+/**
  * Today's date (Y-m-d) in the feed timezone.
  *
  * @return string

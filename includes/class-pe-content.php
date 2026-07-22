@@ -255,6 +255,7 @@ class PE_Content {
 	public static function maybe_enqueue() {
 		if ( is_singular( PE_CPT::POST_TYPE ) ) {
 			wp_enqueue_style( 'parish-events', PE_PLUGIN_URL . 'assets/css/calendar.css', array(), PE_VERSION );
+			pe_enqueue_accent();
 		}
 	}
 }

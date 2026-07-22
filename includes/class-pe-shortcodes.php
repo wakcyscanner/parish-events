@@ -29,6 +29,7 @@ class PE_Shortcodes {
 
 	private static function enqueue() {
 		wp_enqueue_style( 'parish-events', PE_PLUGIN_URL . 'assets/css/calendar.css', array(), PE_VERSION );
+		pe_enqueue_accent();
 	}
 
 	/**
