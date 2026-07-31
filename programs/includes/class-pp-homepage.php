@@ -47,6 +47,12 @@ class PP_Homepage {
 			? $settings['homepage_position']
 			: 'after';
 
+		// Optional link under the cards, e.g. to the full programs page.
+		if ( '' !== $settings['homepage_more_url'] ) {
+			$more_text = '' !== trim( $settings['homepage_more_text'] ) ? $settings['homepage_more_text'] : __( 'See all programs', 'parish-programs' );
+			$html     .= '<p class="pp-more-link"><a href="' . esc_url( $settings['homepage_more_url'] ) . '">' . esc_html( $more_text ) . ' &rarr;</a></p>';
+		}
+
 		// Rendered in the footer, revealed in place. Server-rendered so the
 		// content is crawlable and cached along with the page.
 		echo '<div id="pp-homepage-programs" hidden>' . $html . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- PP_Render escapes its output.

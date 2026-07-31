@@ -47,6 +47,13 @@ class PP_Settings {
 	public static function sanitize( $input ) {
 		$input = is_array( $input ) ? $input : array();
 
+		// Same rule as the meta box link: esc_url_raw mangles junk into a
+		// "URL"; wp_http_validate_url rejects what a visitor couldn't open.
+		$more_url = isset( $input['homepage_more_url'] ) ? esc_url_raw( trim( (string) $input['homepage_more_url'] ), array( 'http', 'https' ) ) : '';
+		if ( '' !== $more_url && false === wp_http_validate_url( $more_url ) ) {
+			$more_url = '';
+		}
+
 		return array(
 			'homepage_enabled'         => empty( $input['homepage_enabled'] ) ? '0' : '1',
 			'homepage_selector'        => isset( $input['homepage_selector'] ) ? sanitize_text_field( $input['homepage_selector'] ) : '',
@@ -55,6 +62,8 @@ class PP_Settings {
 			'homepage_count'           => isset( $input['homepage_count'] ) ? max( 0, min( 24, (int) $input['homepage_count'] ) ) : 6,
 			'homepage_heading'         => isset( $input['homepage_heading'] ) ? sanitize_text_field( $input['homepage_heading'] ) : '',
 			'homepage_group'           => isset( $input['homepage_group'] ) ? sanitize_title( $input['homepage_group'] ) : '',
+			'homepage_more_url'        => $more_url,
+			'homepage_more_text'       => isset( $input['homepage_more_text'] ) ? sanitize_text_field( $input['homepage_more_text'] ) : '',
 			'delete_data_on_uninstall' => empty( $input['delete_data_on_uninstall'] ) ? '0' : '1',
 		);
 	}
@@ -135,6 +144,14 @@ class PP_Settings {
 						<td>
 							<input type="text" class="regular-text" id="pp-heading" name="pp_settings[homepage_heading]" value="<?php echo esc_attr( $settings['homepage_heading'] ); ?>" placeholder="<?php esc_attr_e( 'Grow in Faith', 'parish-programs' ); ?>">
 							<p class="description"><?php esc_html_e( 'Optional heading shown above the display. Leave blank for none.', 'parish-programs' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="pp-more-url"><?php esc_html_e( 'Link below the cards', 'parish-programs' ); ?></label></th>
+						<td>
+							<input type="url" class="regular-text code" id="pp-more-url" name="pp_settings[homepage_more_url]" value="<?php echo esc_attr( $settings['homepage_more_url'] ); ?>" placeholder="https://…">
+							<input type="text" class="regular-text" id="pp-more-text" name="pp_settings[homepage_more_text]" value="<?php echo esc_attr( $settings['homepage_more_text'] ); ?>" placeholder="<?php esc_attr_e( 'See all programs', 'parish-programs' ); ?>">
+							<p class="description"><?php esc_html_e( 'Optional centered link shown under the display — e.g. to the full programs page. Leave the URL blank for none; blank text reads "See all programs".', 'parish-programs' ); ?></p>
 						</td>
 					</tr>
 				</table>

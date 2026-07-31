@@ -26,6 +26,44 @@
 	margin: 0 0 1.5rem;
 }
 
+/*
+ * Consecutive group sections ([parish_programs groups="..."]): room between a
+ * group's cards and the next group's heading.
+ */
+.pp-programs + .pp-programs {
+	margin-top: 3.5rem;
+}
+
+/*
+ * Homepage injection: match the theme's content width and section-heading
+ * style. Both lean on the theme's own custom properties (Diocesan themes
+ * define --limit-width, --font-heading, --clr-primary, --fs-900); the
+ * fallbacks reproduce the plugin's stand-alone look, so themes without
+ * those variables are unaffected.
+ */
+#pp-homepage-programs {
+	width: var(--limit-width, 100%);
+	margin: 0 auto;
+}
+
+#pp-homepage-programs .pp-heading {
+	font-family: var(--font-heading, inherit);
+	font-weight: 400;
+	font-size: var(--fs-900, clamp(1.5rem, 1.33rem + 0.87vw, 2rem));
+	color: var(--clr-primary, var(--pp-blue-dark));
+}
+
+/* Optional link below the cards (homepage injection setting). */
+.pp-more-link {
+	text-align: center;
+	margin: 1.5rem 0 0;
+}
+
+.pp-more-link a {
+	color: var(--clr-primary, var(--pp-blue-dark));
+	font-weight: 600;
+}
+
 /* ---------- Shared card ---------- */
 
 .pp-card {

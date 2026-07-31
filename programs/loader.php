@@ -60,6 +60,8 @@ function pp_get_settings() {
 		'homepage_count'           => 6,
 		'homepage_heading'         => '',
 		'homepage_group'           => '',
+		'homepage_more_url'        => '',
+		'homepage_more_text'       => '',
 		'delete_data_on_uninstall' => '0',
 	);
 

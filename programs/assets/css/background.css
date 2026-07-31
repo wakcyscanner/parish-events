@@ -62,3 +62,53 @@ body.pp-celestial-bg .pp-heading {
 	color: #fff;
 	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
+
+/*
+ * Light-on-dark treatment for the page's own content: celestial pages are
+ * authored like any other page, so the editor content needs its colors
+ * flipped. Groups with their own background keep dark text; details blocks
+ * become frosted panels.
+ */
+body.pp-celestial-bg .entry-content {
+	color: #eef4fb;
+}
+
+body.pp-celestial-bg .entry-content h2,
+body.pp-celestial-bg .entry-content h3,
+body.pp-celestial-bg .entry-content h4 {
+	color: #fff;
+}
+
+body.pp-celestial-bg .entry-content p,
+body.pp-celestial-bg .entry-content li,
+body.pp-celestial-bg .entry-content summary {
+	color: inherit;
+}
+
+body.pp-celestial-bg .entry-content a {
+	color: #9ed3f5;
+}
+
+body.pp-celestial-bg .entry-content .wp-block-group.has-background,
+body.pp-celestial-bg .entry-content .wp-block-group.has-background h2,
+body.pp-celestial-bg .entry-content .wp-block-group.has-background h3,
+body.pp-celestial-bg .entry-content .wp-block-group.has-background h4 {
+	color: #1a3a4d;
+}
+
+body.pp-celestial-bg .entry-content .wp-block-group.has-background a:not(.wp-block-button__link) {
+	color: #155e8d;
+}
+
+body.pp-celestial-bg .entry-content > .wp-block-details {
+	background: rgba(255, 255, 255, 0.09);
+	border: 1px solid rgba(255, 255, 255, 0.22);
+	border-radius: 10px;
+	padding: 14px 18px;
+	margin-bottom: 12px;
+}
+
+body.pp-celestial-bg .entry-content > .wp-block-details summary {
+	font-weight: 600;
+	cursor: pointer;
+}
