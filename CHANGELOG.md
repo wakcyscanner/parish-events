@@ -2,6 +2,14 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.3.0-beta.5 — 2026-07-31
+
+Beta release — beta-channel sites only.
+
+### Changed
+
+- **Buttons on celestial pages start dark, hover light.** The theme's outline buttons read light-on-light against the gradient until hovered; they now start filled navy with white text and flip to white with navy text on hover.
+
 ## 1.3.0-beta.4 — 2026-07-31
 
 Beta release — beta-channel sites only.
