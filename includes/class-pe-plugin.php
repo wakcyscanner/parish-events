@@ -36,10 +36,14 @@ class PE_Plugin {
 			PE_List_Table::init();
 			PE_Meta_Box::init();
 		}
+
+		// Programs feature: separate post type, own settings screen.
+		pp_bootstrap();
 	}
 
 	public static function activate() {
 		PE_CPT::register();
+		PP_CPT::register();
 		PE_Cron::schedule();
 		flush_rewrite_rules();
 	}

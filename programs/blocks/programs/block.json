@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "parish-programs/programs",
+	"title": "Parish Programs",
+	"category": "widgets",
+	"icon": "groups",
+	"description": "Faith formation programs as a card grid or carousel.",
+	"keywords": [ "program", "ministry", "faith", "formation", "cards", "carousel" ],
+	"textdomain": "parish-programs",
+	"attributes": {
+		"heading": { "type": "string", "default": "" },
+		"count": { "type": "number", "default": 0 },
+		"layout": { "type": "string", "default": "grid" },
+		"group": { "type": "string", "default": "" }
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"editorScript": "pp-programs-editor",
+	"editorStyle": "parish-programs",
+	"style": "parish-programs",
+	"viewScript": "pp-carousel"
+}

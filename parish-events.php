@@ -44,6 +44,10 @@ if ( is_admin() ) {
 	require_once PE_PLUGIN_DIR . 'admin/class-pe-meta-box.php';
 }
 
+// Parish Programs: the hand-authored companion to the synced calendar. Its own
+// post type and settings; see programs/loader.php for why it isn't parish_event.
+require_once PE_PLUGIN_DIR . 'programs/loader.php';
+
 register_activation_hook( __FILE__, array( 'PE_Plugin', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'PE_Plugin', 'deactivate' ) );
 
