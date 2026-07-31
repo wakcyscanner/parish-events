@@ -2,6 +2,14 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.3.0-beta.8 — 2026-07-31
+
+Beta release — beta-channel sites only.
+
+### Changed
+
+- **The celestial page-header treatment is removed entirely.** The header module is back to stock theme behavior at every viewport; sizing the banner to the header is better handled by choosing an appropriately shaped image.
+
 ## 1.3.0-beta.7 — 2026-07-31
 
 Beta release — beta-channel sites only.
