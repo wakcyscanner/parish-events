@@ -2,6 +2,14 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.3.0-beta.7 — 2026-07-31
+
+Beta release — beta-channel sites only.
+
+### Fixed
+
+- **The celestial full-height header is now desktop-only** (viewports over 1024px). On smaller screens the theme's header module is untouched — the beta.6 change interfered with the mobile menu and the logged-in admin bar there, and phones already show the photo's full height. The side crop is also now explicitly centered, taking evenly from both edges.
+
 ## 1.3.0-beta.6 — 2026-07-31
 
 Beta release — beta-channel sites only.
