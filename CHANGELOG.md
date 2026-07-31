@@ -2,6 +2,14 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.3.0-beta.4 — 2026-07-31
+
+Beta release — beta-channel sites only.
+
+### Changed
+
+- **Scripture quotes on celestial pages.** Quote and pullquote blocks get a light-on-dark treatment: centered serif italic in white between thin gold hairlines, with the citation in soft gold. Replaces the theme's pullquote look (heavy gray bars, dark gray text) that disappeared against the navy gradient, and renders the pullquote-inside-quote nesting the editor sometimes produces identically to a plain pullquote.
+
 ## 1.3.0-beta.3 — 2026-07-31
 
 Beta release — beta-channel sites only. Display refinements from first staging review of the programs feature.

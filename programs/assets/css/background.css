@@ -114,6 +114,63 @@ body.pp-celestial-bg .entry-content > .wp-block-details summary {
 }
 
 /*
+ * Scripture quotes (quote and pullquote blocks): centered serif italic in
+ * white between thin gold hairlines, citation in soft gold. Overrides the
+ * theme's pullquote treatment (heavy gray bars, dark gray text — invisible
+ * on the navy gradient). The nested rule flattens the pullquote-inside-
+ * quote markup the editor produces when a pullquote is pasted into a quote
+ * block, so both blocks — or the accidental combination — render the same.
+ */
+body.pp-celestial-bg .entry-content .wp-block-quote,
+body.pp-celestial-bg .entry-content .wp-block-pullquote {
+	border: none;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 0;
+	text-align: center;
+	color: #eef4fb;
+}
+
+body.pp-celestial-bg .entry-content .wp-block-pullquote {
+	border-top: 1px solid rgba(218, 165, 32, 0.5);
+	border-bottom: 1px solid rgba(218, 165, 32, 0.5);
+	padding: 1.5em 1em;
+}
+
+/* The outer quote block is just a shell around the nested pullquote. */
+body.pp-celestial-bg .entry-content .wp-block-quote .wp-block-pullquote {
+	margin: 0 !important; /* the theme's pullquote margins are !important */
+}
+
+body.pp-celestial-bg .entry-content .wp-block-quote p,
+body.pp-celestial-bg .entry-content .wp-block-pullquote p {
+	font-family: var(--font-heading, Georgia, serif);
+	font-size: clamp(1.15rem, 1rem + 0.9vw, 1.45rem);
+	line-height: 1.65;
+	font-style: italic;
+	color: #fff;
+	text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.35);
+	max-width: 46ch;
+	margin: 0 auto;
+}
+
+body.pp-celestial-bg .entry-content .wp-block-quote cite,
+body.pp-celestial-bg .entry-content .wp-block-pullquote cite {
+	display: block;
+	margin-top: 0.9rem;
+	font-style: normal;
+	text-transform: none;
+	font-size: 0.95rem;
+	letter-spacing: 0.04em;
+	color: #d9c48a;
+}
+
+body.pp-celestial-bg .entry-content .wp-block-quote cite a,
+body.pp-celestial-bg .entry-content .wp-block-pullquote cite a {
+	color: #d9c48a;
+}
+
+/*
  * Program cards are self-contained white panels; the light-on-dark content
  * rules above must not reach inside them. Higher specificity than every
  * .entry-content rule, so the cards keep their own palette.
