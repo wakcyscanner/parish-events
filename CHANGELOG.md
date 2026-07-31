@@ -2,6 +2,14 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.3.0-beta.6 — 2026-07-31
+
+Beta release — beta-channel sites only.
+
+### Changed
+
+- **Celestial page headers show the photo's full height.** The header follows the banner photo's aspect (16:9 by default, `--pp-header-ratio` to override) instead of a fixed 50vh strip, capped at 90vh and never shorter than the theme's default. When the box is narrower than the photo, the sides crop — the top and bottom never do.
+
 ## 1.3.0-beta.5 — 2026-07-31
 
 Beta release — beta-channel sites only.

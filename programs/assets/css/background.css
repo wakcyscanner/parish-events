@@ -114,6 +114,25 @@ body.pp-celestial-bg .entry-content > .wp-block-details summary {
 }
 
 /*
+ * Page header: show the banner photo's full height and crop its sides,
+ * instead of the theme default (fixed 50vh strip, background-size cover)
+ * that crops the top and bottom off the photo on wide screens. The box
+ * follows the photo's 16:9 aspect (--pp-header-ratio to override for a
+ * different banner, e.g. via the pp_celestial_bg_css filter), capped so it
+ * never swallows the viewport, and the image is sized by height so a
+ * narrower box crops the edges. On ultra-wide viewports where the cap
+ * binds, the photo centers over the celestial gradient rather than being
+ * cut vertically.
+ */
+body.pp-celestial-bg .page-header {
+	height: auto;
+	aspect-ratio: var(--pp-header-ratio, 16 / 9);
+	max-height: 90vh;
+	min-height: 50vh;
+	background-size: auto 100%;
+}
+
+/*
  * Buttons: dark by default, light on hover. The theme ships the reverse
  * (transparent with a light outline, filling dark on hover), which reads
  * light-on-light against the gradient until hovered.
