@@ -31,8 +31,10 @@ class PE_Cache {
 		add_action( 'add_option_pe_cache_ver', array( __CLASS__, 'queue_purge' ) );
 
 		// Settings changes (suppression rules, location directory, linked
-		// URLs) change what rendered calendar pages show.
+		// URLs) change what rendered calendar pages show. add_option too: the
+		// very first settings save on a fresh site goes through add_option.
 		add_action( 'update_option_pe_settings', array( __CLASS__, 'queue_purge' ) );
+		add_action( 'add_option_pe_settings', array( __CLASS__, 'queue_purge' ) );
 
 		// A new plugin version means new CSS/JS; cached pages reference the
 		// old ?ver= URLs and minifiers cache bundles built from them.

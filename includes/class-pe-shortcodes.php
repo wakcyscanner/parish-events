@@ -145,6 +145,16 @@ class PE_Shortcodes {
 	 * @return string[]
 	 */
 	private static function group_names() {
+		// Transient-cached: this runs on every calendar render miss and on
+		// every request carrying a pe_group param (key normalization).
+		$cache_key = 'pe_frag_' . md5(
+			wp_json_encode( array( 'groups', pe_today(), get_option( 'pe_cache_ver', 0 ) ) )
+		);
+		$cached    = get_transient( $cache_key );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
 		$window = pe_import_window();
 		$groups = array();
 		foreach ( self::event_items( pe_today(), $window['end'] ) as $item ) {
@@ -154,6 +164,8 @@ class PE_Shortcodes {
 		}
 		$groups = array_keys( $groups );
 		sort( $groups, SORT_NATURAL | SORT_FLAG_CASE );
+
+		set_transient( $cache_key, $groups, self::CACHE_TTL );
 		return $groups;
 	}
 
@@ -204,19 +216,13 @@ class PE_Shortcodes {
 			$month = substr( pe_today(), 0, 7 );
 		}
 
-		// get_the_ID() in the key: nav links embed the current page's URL, so
-		// two pages using this shortcode must not share a fragment.
-		$cache_key = 'pe_frag_' . md5(
-			wp_json_encode( array( 'cal', get_the_ID(), $atts, $view, $group, $month, pe_today(), get_option( 'pe_cache_ver', 0 ) ) )
-		);
-		$cached    = get_transient( $cache_key );
-		if ( false !== $cached ) {
-			self::enqueue();
-			return $cached;
-		}
-
 		$window = pe_import_window();
 		$months = min( 3, max( 1, (int) $atts['months'] ) );
+
+		// Normalize BEFORE the cache key is computed: every out-of-range
+		// pe_month and unknown pe_group must collapse onto an existing
+		// fragment, or crafted/stale URLs mint a new transient (and pay a
+		// full render) per distinct value.
 
 		// Clamp the requested month to [current month, window end month].
 		$current_month = substr( pe_today(), 0, 7 );
@@ -226,6 +232,26 @@ class PE_Shortcodes {
 		}
 		if ( $month > $end_month ) {
 			$month = $end_month;
+		}
+
+		// An unknown group can only come from a crafted or stale URL (the
+		// dropdown offers real groups only); treat it as "all groups" rather
+		// than rendering an empty calendar per distinct value. Locked groups
+		// are admin-authored and stay as-is (a ministry's group may
+		// legitimately have no upcoming events).
+		if ( ! $locked && '' !== $group && ! in_array( $group, self::group_names(), true ) ) {
+			$group = '';
+		}
+
+		// get_the_ID() in the key: nav links embed the current page's URL, so
+		// two pages using this shortcode must not share a fragment.
+		$cache_key = 'pe_frag_' . md5(
+			wp_json_encode( array( 'cal', get_the_ID(), $atts, $view, $group, $month, pe_today(), get_option( 'pe_cache_ver', 0 ) ) )
+		);
+		$cached    = get_transient( $cache_key );
+		if ( false !== $cached ) {
+			self::enqueue();
+			return $cached;
 		}
 
 		$html = '<div class="pe-calendar">';

@@ -44,7 +44,7 @@ Installable zips are published under [Releases](../../releases).
 ### Calendar integration & SEO
 
 - "Add to calendar (.ics)" and "Google Calendar" buttons on every upcoming event page.
-- Subscribable webcal/ICS feed of all published events at `/?pe_ics=feed`.
+- Subscribable webcal/ICS feed of all published events at `/?pe_ics=feed`. The feed body is cached server-side, served with `Cache-Control: public` and an `ETag` (so polling calendar apps get cheap `304`s), and refreshes whenever an import changes content.
 - Schema.org Event JSON-LD, Open Graph, and Twitter meta tags on single event pages.
 - `wp parish-events import` WP-CLI command (non-zero exit on failure) and `wp parish-events status` for recent runs.
 
@@ -78,8 +78,9 @@ Both channels use the same release workflow: bump the plugin `Version` header, a
 2. Review the settings, then click **Run import now** and spot-check a few event pages and the admin list.
 3. Place `[parish_events_calendar]` on your calendar page and `[parish_events_featured]` wherever featured cards should appear.
 4. Set up a real cron job: WordPress cron only fires on site visits, which is unreliable on low-traffic sites. Either have the host request `wp-cron.php` every 15 minutes and set `define( 'DISABLE_WP_CRON', true );` in `wp-config.php`, or point a system cron job at `wp parish-events import` directly.
-5. Once satisfied, remove any old calendar embed the plugin replaces.
-6. Keep calendar customizations in this plugin (or a site plugin), not in theme files, so theme updates can't overwrite them.
+5. If the site sits behind Cloudflare (or another CDN), add a cache rule for the ICS subscribe feed so calendar-app polling is absorbed at the edge instead of hitting PHP: cache URLs whose query string contains `pe_ics=feed`, respecting the origin cache headers (the plugin sends `Cache-Control: public, max-age=900, s-maxage=3600` plus an `ETag`). CDNs don't cache this URL by default because of the query string.
+6. Once satisfied, remove any old calendar embed the plugin replaces.
+7. Keep calendar customizations in this plugin (or a site plugin), not in theme files, so theme updates can't overwrite them.
 
 ## Shortcodes
 

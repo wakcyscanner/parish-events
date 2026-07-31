@@ -15,6 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class PE_ICS {
 
+	const CACHE_TTL = 6 * HOUR_IN_SECONDS;
+
 	public static function init() {
 		add_action( 'template_redirect', array( __CLASS__, 'maybe_serve' ), 5 );
 	}
@@ -44,6 +46,35 @@ class PE_ICS {
 	}
 
 	private static function serve_feed() {
+		self::send( self::feed_body(), 'parish-events.ics', true );
+	}
+
+	/**
+	 * The subscribable feed body, transient-cached. Subscribed calendar apps
+	 * poll the feed URL indefinitely, and the query string bypasses page
+	 * caches — rebuild at most once per import change (pe_cache_ver) or day
+	 * boundary (the "from today" lower bound).
+	 *
+	 * @return string VCALENDAR document.
+	 */
+	public static function feed_body() {
+		$cache_key = 'pe_ics_feed_' . md5( wp_json_encode( array( pe_today(), get_option( 'pe_cache_ver', 0 ) ) ) );
+		$body      = get_transient( $cache_key );
+
+		if ( ! is_string( $body ) ) {
+			$body = self::build_feed();
+			set_transient( $cache_key, $body, self::CACHE_TTL );
+		}
+
+		return $body;
+	}
+
+	/**
+	 * Build the full subscribable feed body (uncached).
+	 *
+	 * @return string VCALENDAR document.
+	 */
+	private static function build_feed() {
 		$window = pe_import_window();
 		$query  = new WP_Query(
 			array(
@@ -68,7 +99,7 @@ class PE_ICS {
 			$events .= self::vevent( $post->ID );
 		}
 
-		self::send( self::wrap( $events, get_bloginfo( 'name' ) . ' Events' ), 'parish-events.ics' );
+		return self::wrap( $events, get_bloginfo( 'name' ) . ' Events' );
 	}
 
 	/**
@@ -162,12 +193,49 @@ class PE_ICS {
 		return implode( "\r\n", $head ) . "\r\n" . $events . "END:VCALENDAR\r\n";
 	}
 
-	private static function send( $body, $filename ) {
-		nocache_headers();
+	private static function send( $body, $filename, $cacheable = false ) {
+		if ( $cacheable ) {
+			// The subscribe feed may be held by proxies (Cloudflare needs a
+			// cache rule to honor s-maxage on this URL) and revalidated with
+			// ETag, so app polling doesn't cost a PHP worker per hit.
+			header( 'Cache-Control: public, max-age=900, s-maxage=3600' );
+			$etag = '"' . md5( $body ) . '"';
+			header( 'ETag: ' . $etag );
+			if ( self::etag_matches( $etag ) ) {
+				status_header( 304 );
+				exit;
+			}
+		} else {
+			nocache_headers();
+		}
 		header( 'Content-Type: text/calendar; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
 		echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- iCal body, escaped per RFC 5545.
 		exit;
+	}
+
+	/**
+	 * Whether the request's If-None-Match header matches an ETag (handles
+	 * weak validators and comma-separated lists).
+	 *
+	 * @param string $etag Quoted ETag value.
+	 * @return bool
+	 */
+	private static function etag_matches( $etag ) {
+		if ( empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) ) {
+			return false;
+		}
+		$header = trim( wp_unslash( $_SERVER['HTTP_IF_NONE_MATCH'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- compared, never output.
+		foreach ( explode( ',', $header ) as $candidate ) {
+			$candidate = trim( $candidate );
+			if ( 0 === strpos( $candidate, 'W/' ) ) {
+				$candidate = substr( $candidate, 2 );
+			}
+			if ( $candidate === $etag || '*' === $candidate ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

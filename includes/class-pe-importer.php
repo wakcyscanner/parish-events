@@ -79,6 +79,20 @@ class PE_Importer {
 			$settings = PE_Settings::get_all();
 			$seen     = array();
 			$linked   = array();
+			$uid_map  = self::uid_map();
+
+			// Prime the meta cache for every post this run will touch, in one
+			// query instead of one lazy meta load per post inside upsert().
+			$touched = array();
+			foreach ( $rows as $row ) {
+				$uid = $row['ccb_event_id'] . ':' . $row['date'];
+				if ( isset( $uid_map[ $uid ] ) ) {
+					$touched[] = $uid_map[ $uid ];
+				}
+			}
+			foreach ( array_chunk( $touched, 500 ) as $chunk ) {
+				update_meta_cache( 'post', $chunk );
+			}
 
 			foreach ( $rows as $row ) {
 				$valid = PE_Feed_Client::validate_row( $row );
@@ -124,7 +138,7 @@ class PE_Importer {
 				}
 
 				$seen[ $uid ] = true;
-				self::upsert( $row, $uid, $settings, $run );
+				self::upsert( $row, $uid, $settings, $run, $uid_map );
 			}
 
 			self::reconcile( $window, $seen, $run );
@@ -161,8 +175,9 @@ class PE_Importer {
 	 * @param string $uid      "{ccb_event_id}:{date}".
 	 * @param array  $settings Full settings.
 	 * @param array  $run      Run summary (by reference).
+	 * @param array  $uid_map  uid => post_id map (by reference; inserts extend it).
 	 */
-	private static function upsert( $row, $uid, $settings, &$run ) {
+	private static function upsert( $row, $uid, $settings, &$run, &$uid_map ) {
 		$public_desc = pe_extract_public_description( $row['description'] );
 		$location    = pe_apply_location_substitution( $row['location'], $row['name'], $settings );
 		$all_day     = ( '00:00:00' === $row['start_time'] && '23:59:59' === $row['end_time'] ) ? '1' : '0';
@@ -194,10 +209,15 @@ class PE_Importer {
 			$field_hashes[ $key ] = hash( 'sha256', (string) $value );
 		}
 
-		$post_id = self::find_post_by_uid( $uid );
+		$post_id = isset( $uid_map[ $uid ] ) ? $uid_map[ $uid ] : 0;
 
 		if ( $post_id ) {
-			update_post_meta( $post_id, '_pe_last_seen', time() );
+			// Throttled: the value only feeds the admin "last seen" display,
+			// so skipping the write on back-to-back runs saves one postmeta
+			// UPDATE per unchanged row.
+			if ( time() - (int) get_post_meta( $post_id, '_pe_last_seen', true ) > 6 * HOUR_IN_SECONDS ) {
+				update_post_meta( $post_id, '_pe_last_seen', time() );
+			}
 
 			// The event is present upstream again; a stale review flag from a
 			// prior run no longer applies.
@@ -267,6 +287,7 @@ class PE_Importer {
 			}
 			update_post_meta( $post_id, '_pe_uid', $uid );
 			update_post_meta( $post_id, '_pe_last_seen', time() );
+			$uid_map[ $uid ] = $post_id;
 			$run['created']++;
 		}
 
@@ -363,25 +384,34 @@ class PE_Importer {
 	}
 
 	/**
-	 * Find an event post (any status, including pe_removed) by its uid.
+	 * Every event post's uid (any status, including pe_removed) in one query,
+	 * instead of one WP_Query per feed row.
 	 *
-	 * @param string $uid "{ccb_event_id}:{date}".
-	 * @return int Post ID, or 0.
+	 * @return array<string,int> uid => post_id.
 	 */
-	private static function find_post_by_uid( $uid ) {
-		$query = new WP_Query(
-			array(
-				'post_type'              => PE_CPT::POST_TYPE,
-				'post_status'            => array_merge( array_keys( get_post_stati() ) ),
-				'posts_per_page'         => 1,
-				'fields'                 => 'ids',
-				'no_found_rows'          => true,
-				'update_post_term_cache' => false,
-				'meta_key'               => '_pe_uid', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				'meta_value'             => $uid, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+	private static function uid_map() {
+		global $wpdb;
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT pm.meta_value AS uid, pm.post_id
+				 FROM {$wpdb->postmeta} pm
+				 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+				 WHERE pm.meta_key = '_pe_uid' AND p.post_type = %s
+				 ORDER BY pm.post_id",
+				PE_CPT::POST_TYPE
 			)
 		);
-		return $query->posts ? (int) $query->posts[0] : 0;
+
+		$map = array();
+		foreach ( (array) $rows as $row ) {
+			// uids are unique by construction; on a corrupt duplicate keep the
+			// oldest post, deterministically.
+			if ( ! isset( $map[ $row->uid ] ) ) {
+				$map[ $row->uid ] = (int) $row->post_id;
+			}
+		}
+		return $map;
 	}
 
 	/**
