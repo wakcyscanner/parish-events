@@ -44,8 +44,12 @@ class PP_CPT {
 				// REST via its own show_in_rest flags.
 				'show_in_rest'    => true,
 				// page-attributes exposes the Order box; the grid and carousel
-				// sort by it (lowest first), then title.
-				'supports'        => array( 'title', 'editor', 'thumbnail', 'page-attributes' ),
+				// sort by it (lowest first), then title. custom-fields is what
+				// makes the REST posts controller expose the registered meta —
+				// without it there is no `meta` field in wp/v2 responses at
+				// all. The editor's Custom Fields panel stays hidden: it's
+				// opt-in, and protected (_pp_*) keys never show there anyway.
+				'supports'        => array( 'title', 'editor', 'thumbnail', 'page-attributes', 'custom-fields' ),
 				'menu_icon'       => 'dashicons-groups',
 				'capability_type' => 'post',
 				'map_meta_cap'    => true,
@@ -83,6 +87,12 @@ class PP_CPT {
 	}
 
 	private static function register_meta() {
+		// REST-writable by anyone who can edit the post (the keys are
+		// underscore-protected, so an auth_callback is required for REST
+		// writes). Read exposure is fine: every value is printed publicly on
+		// the rendered cards anyway. This is what lets an initial card set be
+		// created over the REST API on hosts without CLI access.
+
 		// Free-text schedule line, e.g. "Tuesdays · Aug 4 – Oct 6 · 6:30 PM".
 		register_post_meta(
 			self::POST_TYPE,
@@ -90,9 +100,9 @@ class PP_CPT {
 			array(
 				'type'              => 'string',
 				'single'            => true,
-				'show_in_rest'      => false,
+				'show_in_rest'      => true,
 				'sanitize_callback' => 'sanitize_text_field',
-				'auth_callback'     => '__return_false',
+				'auth_callback'     => array( __CLASS__, 'can_edit_meta' ),
 			)
 		);
 
@@ -102,9 +112,9 @@ class PP_CPT {
 			array(
 				'type'              => 'string',
 				'single'            => true,
-				'show_in_rest'      => false,
+				'show_in_rest'      => true,
 				'sanitize_callback' => 'esc_url_raw',
-				'auth_callback'     => '__return_false',
+				'auth_callback'     => array( __CLASS__, 'can_edit_meta' ),
 			)
 		);
 
@@ -114,10 +124,22 @@ class PP_CPT {
 			array(
 				'type'              => 'string',
 				'single'            => true,
-				'show_in_rest'      => false,
+				'show_in_rest'      => true,
 				'sanitize_callback' => 'sanitize_text_field',
-				'auth_callback'     => '__return_false',
+				'auth_callback'     => array( __CLASS__, 'can_edit_meta' ),
 			)
 		);
+	}
+
+	/**
+	 * Meta auth: whoever can edit the program can edit its card fields.
+	 *
+	 * @param bool   $allowed  Unused default.
+	 * @param string $meta_key Meta key being written.
+	 * @param int    $post_id  Program post ID.
+	 * @return bool
+	 */
+	public static function can_edit_meta( $allowed, $meta_key, $post_id ) {
+		return current_user_can( 'edit_post', $post_id );
 	}
 }

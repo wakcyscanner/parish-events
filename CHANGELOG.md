@@ -2,6 +2,14 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.3.0-beta.2 — 2026-07-31
+
+Beta release — beta-channel sites only.
+
+### Changed
+
+- **Program card fields are writable over the REST API.** The schedule line, link URL, and link text meta now appear in the `meta` object of `wp/v2/parish_program` responses and accept authenticated writes from anyone who can edit the program (Application Passwords work). This lets an initial card set be created remotely on hosts without CLI access — the same sanitization as the editor meta box applies. The values were already public on every rendered card, so nothing new is exposed to readers.
+
 ## 1.3.0-beta.1 — 2026-07-31
 
 Beta release — beta-channel sites only.
