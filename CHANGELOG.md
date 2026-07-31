@@ -11,7 +11,7 @@ Beta release — beta-channel sites only. Display refinements from first staging
 - **Homepage injection matches the theme.** The injected display now follows the theme's content width (via the theme's own `--limit-width` variable) instead of spanning full width, and its heading picks up the theme's heading font, size, and color (`--font-heading`, `--fs-900`, `--clr-primary`). Themes without those variables keep the previous look.
 - **Optional link below the homepage cards.** New settings fields add a centered link under the injected display — e.g. to the full programs page. Blank text reads "See all programs".
 - **Group sections breathe.** Consecutive group sections (`[parish_programs groups="..."]`) get clear space before the next group's heading.
-- **Celestial pages style their own content.** The celestial background stylesheet now flips the page's editor content to light-on-dark (headings, text, links), keeps dark text inside groups that have their own background, and renders details/summary blocks as frosted panels — no per-page inline CSS needed.
+- **Celestial pages style their own content.** The celestial background stylesheet now flips the page's editor content to light-on-dark (headings, text, links), keeps dark text inside groups that have their own background, and renders details/summary blocks as frosted panels — no per-page inline CSS needed. Program cards are exempt: the light-on-dark rules stop at the card boundary, so card titles, schedule lines, and links keep their own palette.
 
 ## 1.3.0-beta.2 — 2026-07-31
 

@@ -112,3 +112,28 @@ body.pp-celestial-bg .entry-content > .wp-block-details summary {
 	font-weight: 600;
 	cursor: pointer;
 }
+
+/*
+ * Program cards are self-contained white panels; the light-on-dark content
+ * rules above must not reach inside them. Higher specificity than every
+ * .entry-content rule, so the cards keep their own palette.
+ */
+body.pp-celestial-bg .entry-content .pp-card h3 {
+	color: var(--pp-blue-dark);
+}
+
+body.pp-celestial-bg .entry-content .pp-card p {
+	color: var(--pp-text-gray);
+}
+
+body.pp-celestial-bg .entry-content .pp-card p.pp-card-date {
+	color: var(--pp-brown);
+}
+
+body.pp-celestial-bg .entry-content .pp-card a {
+	color: var(--pp-blue-dark);
+}
+
+body.pp-celestial-bg .entry-content .pp-card a:hover {
+	color: var(--pp-blue);
+}
