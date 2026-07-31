@@ -2,6 +2,16 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.2.1 — 2026-07-31
+
+Server-load release: every change reduces uncached PHP work per request, prompted by a brief origin overload behind Cloudflare.
+
+### Changed
+
+- **The ICS subscribe feed is now cached.** `/?pe_ics=feed` was rebuilt from the database on every poll and sent with no-cache headers — and subscribed calendar apps poll it indefinitely. The feed body is now held in a transient (invalidated by imports and content edits, and at each day boundary) and served with `Cache-Control: public, max-age=900, s-maxage=3600` plus an `ETag`, answering unchanged polls with `304 Not Modified`. See the new launch-checklist step for caching it at the CDN edge. Per-event `.ics` downloads are unchanged.
+- **Calendar URL parameters are normalized before fragment caching.** Out-of-range `pe_month` values and unknown `pe_group` values (from stale or crafted URLs) previously each minted a fresh cache entry and paid a full uncached render; they now collapse onto the existing clamped/unfiltered fragment. An unknown group shows the full calendar instead of an empty one. The group list used by the filter dropdown is also cached.
+- **Imports issue far fewer queries.** The importer now resolves all existing events with one query up front (instead of one lookup per feed row), warms the meta cache for the posts it will touch in one pass, and skips redundant "last seen" bookkeeping writes on back-to-back runs. No behavior change to what gets created, updated, removed, or restored.
+
 ## 1.2.0 — 2026-07-22
 
 ### New
