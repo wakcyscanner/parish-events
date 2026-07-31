@@ -1,0 +1,64 @@
+/*
+ * "Celestial" page background, ported from the legacy Come to Me page:
+ * a fixed navy gradient with softly drifting golden glow layers.
+ * Applied via the pp-celestial-bg body class (per-page checkbox).
+ */
+
+body.pp-celestial-bg {
+	background: linear-gradient(135deg, #1a2845 0%, #2d4263 50%, #1a2845 100%) !important;
+	background-attachment: fixed !important;
+	position: relative;
+}
+
+body.pp-celestial-bg::before {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-image:
+		radial-gradient(ellipse 300px 150px at 25% 20%, rgba(218, 165, 32, 0.12) 30%, transparent 70%),
+		radial-gradient(ellipse 400px 200px at 75% 40%, rgba(255, 215, 0, 0.08) 40%, transparent 80%),
+		radial-gradient(ellipse 350px 180px at 50% 70%, rgba(255, 228, 181, 0.10) 35%, transparent 75%),
+		radial-gradient(ellipse 250px 120px at 80% 80%, rgba(240, 230, 140, 0.07) 25%, transparent 65%),
+		radial-gradient(ellipse 200px 100px at 15% 85%, rgba(218, 165, 32, 0.09) 20%, transparent 60%),
+		radial-gradient(circle 3px at 20% 30%, rgba(255, 215, 0, 0.6), transparent 4px),
+		radial-gradient(circle 2px at 80% 20%, rgba(255, 215, 0, 0.5), transparent 3px),
+		radial-gradient(circle 2px at 40% 60%, rgba(255, 228, 181, 0.4), transparent 3px),
+		radial-gradient(circle 3px at 90% 70%, rgba(218, 165, 32, 0.5), transparent 4px),
+		radial-gradient(circle 2px at 10% 80%, rgba(255, 215, 0, 0.4), transparent 3px),
+		radial-gradient(circle 2px at 60% 15%, rgba(240, 230, 140, 0.5), transparent 3px),
+		radial-gradient(circle 3px at 30% 90%, rgba(255, 215, 0, 0.45), transparent 4px);
+	pointer-events: none;
+	z-index: -1;
+	animation: pp-drift-clouds 60s ease-in-out infinite;
+}
+
+@keyframes pp-drift-clouds {
+	0%, 100% { transform: translateX(0) translateY(0); }
+	25% { transform: translateX(-10px) translateY(-5px); }
+	50% { transform: translateX(10px) translateY(5px); }
+	75% { transform: translateX(-5px) translateY(-10px); }
+}
+
+/*
+ * Let the gradient show through the content column. These cover the common
+ * wrapper selectors (block themes, classic themes, Diocesan themes); add
+ * site-specific ones via the pp_celestial_bg_css filter if the theme paints
+ * another wrapper white.
+ */
+body.pp-celestial-bg .wp-site-blocks,
+body.pp-celestial-bg .site-content,
+body.pp-celestial-bg .content-area,
+body.pp-celestial-bg #content,
+body.pp-celestial-bg #primary,
+body.pp-celestial-bg main {
+	background: transparent;
+}
+
+/* Light-on-dark treatment for the plugin's own heading, as on the old page. */
+body.pp-celestial-bg .pp-heading {
+	color: #fff;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}

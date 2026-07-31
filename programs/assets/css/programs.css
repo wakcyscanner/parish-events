@@ -1,0 +1,314 @@
+/*
+ * Parish Programs card grid + carousel.
+ * Ported from the legacy Come to Me page (cometome.stpacc.org); everything is
+ * scoped under .pp-programs so theme styles stay untouched.
+ */
+
+.pp-programs {
+	--pp-blue: #91d1e5;
+	--pp-blue-dark: #5F9EA0;
+	--pp-blue-light: #B8DCE8;
+	--pp-cloud-gray: #E6E6FA;
+	--pp-text-gray: #6C757D;
+	--pp-brown: #a05946;
+	--pp-shadow: rgba(42, 64, 99, 0.35);
+	--pp-radius: 16px;
+	--pp-gap: 1rem;
+	--pp-peek: 40px;
+}
+
+.pp-heading {
+	text-align: center;
+	color: var(--pp-blue-dark);
+	font-size: clamp(1.5rem, 1.33rem + 0.87vw, 2rem);
+	font-weight: 600;
+	line-height: 1.2;
+	margin: 0 0 1.5rem;
+}
+
+/* ---------- Shared card ---------- */
+
+.pp-card {
+	background: #fff;
+	border-radius: var(--pp-radius);
+	box-shadow: 0 4px 20px rgba(42, 64, 99, 0.15);
+	overflow: hidden;
+	border: 1px solid var(--pp-cloud-gray);
+	display: flex;
+	flex-direction: column;
+	transition: box-shadow 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pp-card-image {
+	background: var(--pp-blue-light);
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.pp-card-image img {
+	width: 100%;
+	display: block;
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+
+.pp-card-content {
+	padding: 0.9rem 1.25rem 1.1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	flex: 1;
+}
+
+.pp-card-content h3 {
+	color: var(--pp-blue-dark);
+	font-size: 1.15rem;
+	font-weight: 600;
+	line-height: 1.3;
+	margin: 0;
+}
+
+.pp-card-date {
+	color: var(--pp-brown);
+	font-size: 0.85rem;
+	font-weight: 700;
+	margin: 0;
+}
+
+.pp-card-desc {
+	color: var(--pp-text-gray);
+	font-size: 0.92rem;
+	line-height: 1.55;
+}
+
+.pp-card-desc p {
+	margin: 0 0 0.6em;
+	color: inherit;
+	font-size: inherit;
+	line-height: inherit;
+}
+
+.pp-card-desc p:last-child {
+	margin-bottom: 0;
+}
+
+.pp-card-link {
+	color: var(--pp-blue-dark);
+	text-decoration: none;
+	font-weight: 600;
+	font-size: 0.95rem;
+	margin-top: auto;
+	padding-top: 0.5rem;
+	flex-shrink: 0;
+	transition: color 0.3s ease;
+}
+
+.pp-card-link:hover {
+	color: var(--pp-blue);
+	text-decoration: none;
+}
+
+/* ---------- Grid layout ---------- */
+
+.pp-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2rem;
+	justify-content: center;
+	width: 100%;
+}
+
+.pp-grid .pp-card {
+	flex: 1 1 300px;
+	min-width: 280px;
+	max-width: 400px;
+}
+
+.pp-grid .pp-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 8px 30px var(--pp-shadow);
+}
+
+.pp-grid .pp-card-image {
+	min-height: 0;
+}
+
+.pp-grid .pp-card-image img {
+	height: auto;
+	object-fit: contain;
+	object-position: center;
+}
+
+/* ---------- Carousel layout ---------- */
+
+.pp-carousel {
+	position: relative;
+	padding: 0 24px;
+}
+
+.pp-viewport {
+	overflow-x: auto;
+	scroll-behavior: smooth;
+	scroll-snap-type: x mandatory;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+}
+
+.pp-viewport::-webkit-scrollbar {
+	display: none;
+}
+
+.pp-track {
+	display: flex;
+	gap: var(--pp-gap);
+	padding: 8px 0 12px;
+}
+
+/* Cards: fixed height, sized to show 3 + a peek of the 4th */
+.pp-carousel .pp-card {
+	flex: 0 0 calc((100% - 2 * var(--pp-gap) - var(--pp-peek)) / 3);
+	min-width: 260px;
+	height: 430px;
+	scroll-snap-align: start;
+}
+
+.pp-carousel .pp-card:hover {
+	box-shadow: 0 8px 30px rgba(42, 64, 99, 0.25);
+}
+
+.pp-carousel .pp-card.pp-expanded {
+	height: auto;
+}
+
+.pp-carousel .pp-card-image {
+	height: 180px;
+	min-height: 180px;
+	flex-shrink: 0;
+}
+
+.pp-carousel .pp-card-image img {
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+}
+
+.pp-carousel .pp-card-content {
+	overflow: hidden;
+}
+
+/* Description: takes remaining space, clipped with a fade */
+.pp-card-desc-wrap {
+	position: relative;
+	flex: 1;
+	overflow: hidden;
+	min-height: 0;
+}
+
+.pp-card-fade {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 2.5em;
+	background: linear-gradient(transparent, #fff);
+	pointer-events: none;
+	display: none;
+}
+
+.pp-card-desc-wrap.pp-overflowing .pp-card-fade {
+	display: block;
+}
+
+.pp-card-toggle {
+	background: none;
+	border: none;
+	color: var(--pp-blue-dark);
+	font-size: 0.82rem;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 0.25rem 0 0;
+	display: none;
+	flex-shrink: 0;
+	text-align: left;
+}
+
+.pp-card-toggle.pp-visible {
+	display: inline-block;
+}
+
+.pp-card-toggle:hover {
+	color: var(--pp-blue);
+}
+
+/* Arrow buttons */
+.pp-arrow {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.95);
+	border: 1px solid #ddd;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	z-index: 2;
+	transition: opacity 0.2s, box-shadow 0.2s;
+	font-size: 0;
+}
+
+.pp-arrow:hover {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.pp-arrow.pp-hidden {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.pp-arrow svg {
+	width: 18px;
+	height: 18px;
+	fill: none;
+	stroke: var(--pp-blue-dark);
+	stroke-width: 2.5;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.pp-arrow-prev {
+	left: 0;
+}
+
+.pp-arrow-next {
+	right: 0;
+}
+
+/* Responsive: 2 cards + peek on medium, 1 + peek on small */
+@media (max-width: 900px) {
+	.pp-carousel .pp-card {
+		flex-basis: calc((100% - var(--pp-gap) - var(--pp-peek)) / 2);
+	}
+}
+
+@media (max-width: 560px) {
+	.pp-carousel .pp-card {
+		flex-basis: calc(100% - var(--pp-peek));
+	}
+
+	.pp-carousel {
+		padding: 0 20px;
+	}
+
+	.pp-arrow {
+		width: 34px;
+		height: 34px;
+	}
+}
