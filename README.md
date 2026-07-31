@@ -1,4 +1,4 @@
-# Parish Events &amp; Programs
+# Parish Events & Programs
 
 A WordPress plugin that turns a parish calendar feed into real WordPress content. It imports events from a Church Community Builder (CCB) XML feed into a custom post type on a schedule, giving every event a permanent URL, search-engine structured data, and full editorial control — replacing client-side calendar embeds.
 
