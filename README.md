@@ -1,6 +1,8 @@
-# Parish Events
+# Parish Events &amp; Programs
 
 A WordPress plugin that turns a parish calendar feed into real WordPress content. It imports events from a Church Community Builder (CCB) XML feed into a custom post type on a schedule, giving every event a permanent URL, search-engine structured data, and full editorial control — replacing client-side calendar embeds.
+
+It also provides **Programs**: hand-authored sets of events packaged together for promotion, displayed as card grids or carousels. See [Programs](#programs).
 
 **Requires:** WordPress 6.0+, PHP 7.4+ · **License:** [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html)
 
@@ -48,6 +50,18 @@ Installable zips are published under [Releases](../../releases).
 - Schema.org Event JSON-LD, Open Graph, and Twitter meta tags on single event pages.
 - `wp parish-events import` WP-CLI command (non-zero exit on failure) and `wp parish-events status` for recent runs.
 
+### Programs
+
+A **program** is a set of events packaged together for promotion — "Financial Peace University", "That Man is You!", an adoration chapel signup. Unlike calendar events they are hand-authored, have no upstream feed, and have no pages of their own: every card links out to a ministry or registration page.
+
+- Separate `parish_program` post type, edited under **Programs**. Title, description, image, an optional free-text schedule line ("Tuesdays · Aug 4 – Oct 6 · 6:30 PM"), and a link with custom button text.
+- **Program Groups** taxonomy for sectioning ("Upcoming Series", "Grow in Community"), and drag-free ordering via the Order field.
+- Display as a card grid or carousel with `[parish_programs]`, the **Parish Programs** block, or homepage injection — a CSS-selector-based insert for themes whose homepage template can't be edited.
+- Settings under **Programs → Settings**, kept separate from calendar settings.
+- `wp parish-programs import --from=<url-or-path>` migrates programs from the legacy Come to Me `programs.json`, sideloading images into the media library.
+
+Programs are deliberately *not* stored as parish events. Events are feed-owned — the importer reconciles them against ChMS on every run and marks rows *Removed upstream* when they disappear — so hand-authored rows in that post type would be reconciled away. The importer is scoped to the event post type throughout, so the two features never touch.
+
 ## Installation
 
 1. Download the latest `parish-events-x.y.z.zip` from [Releases](../../releases).
@@ -89,7 +103,10 @@ Both channels use the same release workflow: bump the plugin `Version` header, a
 [parish_events_featured count="3" order="date" columns="3" show_excerpt="1"]
 [parish_events_upcoming count="5" show_location="0"]
 [parish_events_subscribe label="Subscribe to calendar"]
+[parish_programs layout="grid" count="0" heading="" align="" group="" groups=""]
 ```
+
+`[parish_programs]`: `layout` is `grid` or `carousel`; `count="0"` shows all; `group` filters to one Program Group slug; `groups` renders one titled section per group (comma-separated slugs, or `all`) and takes precedence over `group`.
 
 ## FAQ
 

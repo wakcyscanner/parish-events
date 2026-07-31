@@ -2,6 +2,20 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.3.0-beta.1 — 2026-07-31
+
+Beta release — beta-channel sites only.
+
+### New
+
+- **Parish Programs.** Faith-formation programs and ministries — a set of events packaged together for promotion, like "Financial Peace University" or "That Man is You!" — are now a second post type in this plugin, folded in from the standalone `parish-programs` plugin so the site runs two custom plugins instead of three. Add them under **Programs**, group them with the **Program Groups** taxonomy, order them with the Order field, and display them with the `[parish_programs]` shortcode, the Parish Programs block, or automatic homepage injection for themes whose homepage template can't be edited. Each card links out to a ministry or registration page; programs have no single pages of their own. Settings live under **Programs → Settings**, separate from calendar settings.
+- **`wp parish-programs import --from=<url-or-path>`** imports programs from the legacy Come to Me `programs.json`, sideloading card images into the media library. A one-time migration helper, distinct from `wp parish-events import`.
+
+### Notes
+
+- Programs are a separate post type from parish events on purpose. Events are feed-owned — the importer reconciles them against ChMS on every run and marks rows *Removed upstream* when they disappear. Programs are editor-owned with no upstream, so hand-authored rows in the synced post type would be reconciled away. Nothing in the event import path changes: every importer query is scoped to the event post type, so a second post type is invisible to sync and removal.
+- Existing calendar behavior, settings, shortcodes, and CLI commands are unchanged. Sites that add no programs see only a new, empty **Programs** menu.
+
 ## 1.2.1 — 2026-07-31
 
 Server-load release: every change reduces uncached PHP work per request, prompted by a brief origin overload behind Cloudflare.
