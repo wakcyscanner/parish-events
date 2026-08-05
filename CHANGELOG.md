@@ -2,6 +2,25 @@
 
 Notes for each [published release](../../releases). The release workflow copies a version's section below into its GitHub Release, and refuses to publish a version that has no section here.
 
+## 1.3.0 — 2026-08-05
+
+### New
+
+- **Parish Programs.** Faith-formation programs and ministries — a set of events packaged together for promotion, like "Financial Peace University" or "That Man is You!" — are now a second post type in this plugin, folded in from the standalone `parish-programs` plugin so the site runs two custom plugins instead of three. Add them under **Programs**, group them with the **Program Groups** taxonomy, order them with the Order field, and display them with the `[parish_programs]` shortcode, the Parish Programs block, or automatic homepage injection for themes whose homepage template can't be edited. Each card links out to a ministry or registration page; programs have no single pages of their own. Settings live under **Programs → Settings**, separate from calendar settings.
+- **Celestial page backgrounds.** A per-page checkbox gives ministry pages a navy gradient background with drifting golden accents. The stylesheet flips the page's editor content to light-on-dark (headings, text, links), renders details/summary blocks as frosted panels, styles quote and pullquote blocks as centered serif italic in white between thin gold hairlines with the citation in soft gold, and starts the theme's outline buttons filled navy with white text (hover flips to white with navy text). Program cards are exempt: the light-on-dark rules stop at the card boundary, so card titles, schedule lines, and links keep their own palette.
+- **Program card fields are writable over the REST API.** The schedule line, link URL, and link text meta appear in the `meta` object of `wp/v2/parish_program` responses and accept authenticated writes from anyone who can edit the program (Application Passwords work). This lets an initial card set be created remotely on hosts without CLI access — the same sanitization as the editor meta box applies.
+- **`wp parish-programs import --from=<url-or-path>`** imports programs from the legacy Come to Me `programs.json`, sideloading card images into the media library. A one-time migration helper, distinct from `wp parish-events import`.
+
+### Changed
+
+- **Homepage injection matches the theme.** The injected display follows the theme's content width (via the theme's own `--limit-width` variable) instead of spanning full width, and its heading picks up the theme's heading font, size, and color (`--font-heading`, `--fs-900`, `--clr-primary`). Themes without those variables keep the generic look. New settings fields add an optional centered link under the injected cards — e.g. to the full programs page — with blank text reading "See all programs".
+- **Group sections breathe.** Consecutive group sections (`[parish_programs groups="..."]`) get clear space before the next group's heading.
+
+### Notes
+
+- Programs are a separate post type from parish events on purpose. Events are feed-owned — the importer reconciles them against ChMS on every run and marks rows *Removed upstream* when they disappear. Programs are editor-owned with no upstream, so hand-authored rows in the synced post type would be reconciled away. Nothing in the event import path changes: every importer query is scoped to the event post type, so the second post type is invisible to sync and removal.
+- Existing calendar behavior, settings, shortcodes, and CLI commands are unchanged. Sites that add no programs see only a new, empty **Programs** menu.
+
 ## 1.3.0-beta.8 — 2026-07-31
 
 Beta release — beta-channel sites only.
